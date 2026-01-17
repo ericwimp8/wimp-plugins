@@ -1,0 +1,18 @@
+{
+  "name": "test-writer-dart",
+  "version": "1.0.0",
+  "description": "Test generation for Dart and Flutter. Uses language-agnostic methodology with Dart-specific patterns including mocktail and Riverpod testing.",
+  "author": {
+    "name": "Eric Wimp"
+  },
+  "license": "MIT",
+  "keywords": [
+    "testing",
+    "unit-tests",
+    "test-generation",
+    "dart",
+    "flutter",
+    "riverpod",
+    "mocktail"
+  ]
+}

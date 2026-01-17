@@ -1,0 +1,55 @@
+{
+  "name": "wimp-plugins",
+  "owner": {
+    "name": "Eric Wimp"
+  },
+  "metadata": {
+    "description": "Claude Code plugin marketplace"
+  },
+  "plugins": [
+    {
+      "name": "test-writer-dart",
+      "source": "./",
+      "description": "Test generation for Dart and Flutter with mocktail and Riverpod patterns",
+      "commands": ["./test-writer-dart/commands", "./shared/commands"],
+      "agents": [
+        "./shared/agents/tw-plan-cases.md",
+        "./shared/agents/tw-write-test.md",
+        "./shared/agents/tw-check-redundancy.md",
+        "./shared/agents/tw-run-fix.md",
+        "./shared/agents/tw-check-testability.md",
+        "./shared/agents/tw-discover-failing-tests.md"
+      ],
+      "skills": ["./test-writer-dart/skills"]
+    },
+    {
+      "name": "test-writer-typescript",
+      "source": "./",
+      "description": "Test generation for TypeScript with Jest and Firebase Functions patterns",
+      "commands": ["./test-writer-typescript/commands", "./shared/commands"],
+      "agents": [
+        "./shared/agents/tw-plan-cases.md",
+        "./shared/agents/tw-write-test.md",
+        "./shared/agents/tw-check-redundancy.md",
+        "./shared/agents/tw-run-fix.md",
+        "./shared/agents/tw-check-testability.md",
+        "./shared/agents/tw-discover-failing-tests.md"
+      ],
+      "skills": ["./test-writer-typescript/skills"]
+    },
+    {
+      "name": "creating-topical-skills",
+      "source": "./creating-topical-skills",
+      "strict": false,
+      "version": "1.0.0",
+      "description": "Comprehensive guide and tools for creating high-quality Agent Skills in Claude Code",
+      "license": "MIT",
+      "keywords": ["skills", "agent-skills", "tutorial", "documentation"]
+    },
+    {
+      "name": "token-furnace",
+      "source": "./token-furnace",
+      "description": "Implementation workflow that burns tokens liberally for thorough planning and execution"
+    }
+  ]
+}

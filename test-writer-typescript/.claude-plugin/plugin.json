@@ -1,0 +1,18 @@
+{
+  "name": "test-writer-typescript",
+  "version": "1.0.0",
+  "description": "Test generation for TypeScript. Uses language-agnostic methodology with Jest-specific patterns including Firebase Functions testing.",
+  "author": {
+    "name": "Eric Wimp"
+  },
+  "license": "MIT",
+  "keywords": [
+    "testing",
+    "unit-tests",
+    "test-generation",
+    "typescript",
+    "jest",
+    "firebase",
+    "cloud-functions"
+  ]
+}
