@@ -1,7 +1,8 @@
 {
   "name": "wimp-plugins",
   "owner": {
-    "name": "Eric Wimp"
+    "name": "Eric Wimp",
+    "email": "ericwimp8@gmail.com"
   },
   "metadata": {
     "description": "Claude Code plugin marketplace"
