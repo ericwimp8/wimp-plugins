@@ -163,6 +163,12 @@ Read the spec as an implementer. For each section ask: "Could I implement this?"
 - Skip items already in Open Questions
 - Note gaps (missing info that blocks implementation)
 
+**STOP. Before noting a gap, ask: "Is this WHAT to build or HOW to build it?"**
+- WHAT: User-visible behavior, requirements, outcomes → Gap
+- HOW: Code patterns, widget choices, API calls, implementation details → NOT a gap. Move on.
+
+If the spec explicitly defers something to "implementation" → NOT a gap. The spec is telling you this is intentionally left for later.
+
 ### Step 3: Fill Gaps
 
 For each gap found:

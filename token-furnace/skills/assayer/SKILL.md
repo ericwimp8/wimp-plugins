@@ -190,6 +190,12 @@ Where the answer is NO, note:
 - What specific information is missing
 - Why you can't proceed without it
 
+**STOP. Before proceeding, ask: "Is this WHAT to build or HOW to build it?"**
+- WHAT: User-visible behavior, requirements, outcomes → Blocker
+- HOW: Code patterns, widget choices, API calls, implementation details → NOT a blocker. Move on.
+
+If the spec explicitly defers something to "implementation" → NOT a blocker. The spec is telling you this is intentionally left for later.
+
 **Filter as you go:** If a statement clearly tells you what to do, it's not a blocker. Move on.
 
 ### Step 3: Search to Fill Gaps
