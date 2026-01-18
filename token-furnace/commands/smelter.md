@@ -126,11 +126,15 @@ For each phase (sequential):
     │  1. Invoke deep-drill                         │
     │  2. Verify plan file exists                   │
     │  3. Invoke slag-check                         │
-    │     ├── ISSUES:                               │
+    │     ├── ISSUES (attempts 1-3):                 │
+    │     │   → Auto-retry: feed issues to          │
+    │     │     deep-drill, loop to step 1          │
+    │     │   → No user input during auto-retry     │
+    │     │                                         │
+    │     ├── ISSUES (after 3 attempts exhausted):  │
     │     │   → Show issues to user                 │
     │     │   → User: retry / accept / guidance     │
-    │     │   → If retry: loop (max 3 attempts)     │
-    │     │   → If accept: continue to step 4       │
+    │     │   → Continue based on user choice       │
     │     │                                         │
     │     └── PASS:                                 │
     │         → Show plan to user                   │
@@ -237,18 +241,55 @@ Phase:
 
 **Handle the output:**
 - If `PASS` → show user the plan is ready for review (see Human Checkpoint: PASS)
-- If `ISSUES` → show user the issues and get input (see Human Checkpoint: ISSUES)
+- If `ISSUES` → check attempt count (see Automatic Retry Phase)
+
+---
+
+## Automatic Retry Phase (Attempts 1-3)
+
+When slag-check returns ISSUES during the first 3 attempts, retry automatically without user input.
+
+**Automatic retry behavior:**
+
+1. Log the attempt (for your own tracking, not shown to user):
+   ```
+   [Auto-retry] Phase [N], attempt [X]/3 - slag-check found issues, retrying...
+   ```
+
+2. Feed slag-check issues directly to deep-drill:
+   - Build feedback from slag-check issues (no user guidance yet)
+   - Invoke deep-drill with Feedback and Previous attempt
+   - Run slag-check on new output
+
+3. Repeat until:
+   - slag-check returns PASS → proceed to Human Checkpoint: PASS
+   - 3 automatic attempts exhausted with ISSUES → proceed to Human Checkpoint: ISSUES
+
+**Feedback format for automatic retry:**
+```
+{slag_check_issues}
+```
+
+**Do NOT:**
+- Show intermediate issues to user during auto-retry
+- Ask for user input during auto-retry
+- Stop for confirmation between auto-retries
+
+**Do:**
+- Track attempt count internally
+- Pass full slag-check issues as feedback each time
+- Move to user checkpoint only after auto-retries exhausted or PASS received
 
 ---
 
 ## Human Checkpoint: ISSUES
 
-When slag-check returns ISSUES, present to the user VERBATIM (DO NOT SUMMARIZE - copy full output exactly):
+When slag-check returns ISSUES **after 3 automatic retry attempts have been exhausted**, present to the user VERBATIM (DO NOT SUMMARIZE - copy full output exactly):
 
 ```
 ## Phase [N] Audit: Issues Found
 
-Slag-check found the following issues with the plan:
+After 3 automatic retry attempts, slag-check still found issues:
 
 ## Issues Found
 [Preserve FULL structure from slag-check - do NOT summarize]
@@ -257,19 +298,19 @@ Slag-check found the following issues with the plan:
 ## Summary
 [Copy summary from slag-check exactly]
 
-**Attempt [X] of 3**
+**Automatic attempts exhausted (3/3)**
 
 How would you like to proceed?
-1. **Retry** - Let deep-drill try again with this feedback
+1. **Retry with guidance** - Provide context to help deep-drill (e.g., "there's no existing pattern, use X approach")
 2. **Accept anyway** - These issues are acceptable, proceed to proof
-3. **Provide guidance** - Add context to help deep-drill (e.g., "there's no existing pattern, use X approach" or "look at feature Y instead")
+3. **Stop** - Halt smelter to review manually
 ```
 
 **Based on user response:**
 
-- **Retry**: Invoke deep-drill with slag-check issues as feedback
+- **Retry with guidance**: User provides additional context. Combine slag-check issues + user guidance as feedback, then invoke deep-drill. After this attempt, return to slag-check → user checkpoint flow (no more automatic retries)
 - **Accept anyway**: Skip retry, proceed directly to proof
-- **Provide guidance**: User provides additional context. Combine slag-check issues + user guidance as feedback, then invoke deep-drill
+- **Stop**: Halt processing, let user investigate manually
 
 **Feedback format when user provides guidance:**
 ```
@@ -278,6 +319,8 @@ How would you like to proceed?
 User guidance:
 {user_guidance}
 ```
+
+**Note:** After automatic retries are exhausted, every subsequent retry requires user input. There are no more automatic retries for this phase.
 
 ---
 
@@ -302,7 +345,7 @@ Options:
 **Based on user response:**
 
 - **Confirm**: Proceed to invoke proof
-- **Request changes**: User provides feedback. Invoke deep-drill with user feedback, then run slag-check again
+- **Request changes**: User provides feedback. Invoke deep-drill with user feedback, then run slag-check again. Present result directly to user (Human Checkpoint: PASS or ISSUES) - no automatic retries since user is already in the loop.
 
 **Feedback format when user requests changes:**
 ```
@@ -374,31 +417,29 @@ plans/[slug]/
 
 ## Retry Logic
 
-When user chooses to retry (from Human Checkpoint: ISSUES):
+### Automatic Retries (Attempts 1-3)
 
-1. Build feedback from slag-check issues + any user guidance
-2. Invoke deep-drill with Feedback and Previous attempt
-3. Run slag-check again on the new output
-4. Present new result to user (Human Checkpoint: ISSUES or PASS)
-5. Repeat based on user choice, max 3 attempts total
+During the first 3 attempts, retries happen automatically:
 
-**If max retries exceeded (3 attempts):**
-```
-## Phase [N] Max Retries Reached
+1. slag-check returns ISSUES
+2. Build feedback from slag-check issues only (no user input)
+3. Invoke deep-drill with Feedback and Previous attempt
+4. Run slag-check again on the new output
+5. If ISSUES again and under 3 attempts, repeat automatically
+6. If PASS, proceed to Human Checkpoint: PASS
+7. If 3 attempts exhausted with ISSUES, proceed to Human Checkpoint: ISSUES
 
-After 3 attempts, slag-check still found issues:
+### User-Guided Retries (After Auto-Retries Exhausted)
 
-[Latest issues]
+When user chooses "Retry with guidance" from Human Checkpoint: ISSUES:
 
-Options:
-1. **Accept anyway** - Proceed with current plan despite issues
-2. **Stop** - Halt smelter to review manually
-3. **One more try with guidance** - Provide specific guidance for a final attempt
+1. User provides guidance
+2. Combine slag-check issues + user guidance as feedback
+3. Invoke deep-drill with Feedback and Previous attempt
+4. Run slag-check on new output
+5. Present result to user (back to Human Checkpoint: ISSUES or PASS)
 
-What would you like to do?
-```
-
-**Note:** The max retry limit is a safety net. With human guidance at each step, most issues should resolve before hitting this limit.
+**Note:** After automatic retries are exhausted, the loop continues with user input at each step until user accepts or stops.
 
 ---
 
@@ -480,13 +521,14 @@ Spec from intake
 Smelter reads spec, identifies phases
         ↓
 For each phase:
-    deep-drill → slag-check → USER CHECKPOINT → proof
+    deep-drill → slag-check → [auto-retry x3] → USER CHECKPOINT → proof
                      ↓
-              (user reviews issues or confirms plan)
+              (automatic retry if ISSUES, up to 3 attempts)
+              (user only consulted after auto-retries or on PASS)
         ↓
 Plans with success criteria for all phases
         ↓
 Ready for build planning
 ```
 
-**Human-in-the-loop:** User is consulted after every slag-check, whether ISSUES or PASS. This allows course correction before burning tokens on retries or next phases.
+**Automatic-first, then human-in-the-loop:** Smelter automatically retries up to 3 times when slag-check finds issues. User is only consulted after automatic retries are exhausted or when the plan passes. This reduces friction while preserving human oversight for persistent issues.

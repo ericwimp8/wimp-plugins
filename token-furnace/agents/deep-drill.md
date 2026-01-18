@@ -62,37 +62,65 @@ Extract from the phase description:
 
 ### Step 2: Pattern Discovery
 
-**Find analogous implementations:**
-- Search for existing features similar to what this phase needs
-- These become your templates
-- If the phase spans multiple layers, find analogies for each layer
+**IMPORTANT: Checking skills is not negotiable. Skills contain architectural patterns, canonical examples, and domain conventions that you require to do this job properly. If you are considering not using skills, you are making a mistake. You MUST check and load all relevant skills. You MUST read the relevant documents in the skills or you WILL fail.**
 
-**Extract conventions per layer:**
-For each layer this phase touches, document:
-- File/folder structure - where do these files live?
-- Naming patterns - how are similar things named?
-- Base classes/mixins - what should be extended?
-- Common utilities - what helpers are typically used?
-- Boilerplate patterns - what repeated structure appears?
-- Dependency patterns - how are dependencies injected?
+1. **Invoke relevant skills (MANDATORY)** - Skills may contain:
+   - Architectural patterns for this type of feature
+   - Canonical examples of similar implementations
+   - Layer-specific conventions and rules
+   - Common pitfalls to avoid
 
-**Verify pattern files exist:**
-- Use Glob to confirm referenced files actually exist
-- Read them to verify they're appropriate templates
+**IMPORTANT: Searching the codebase is not negotiable. The codebase has existing patterns and implementations that you require to do this job properly. If you are considering not searching, you are making a mistake. You MUST search for similar patterns using Glob/Grep/Read or you WILL fail.**
+
+2. **Find analogous implementations (MANDATORY):**
+   - Search for existing features similar to what this phase needs
+   - These become your templates
+   - If the phase spans multiple layers, find analogies for each layer
+
+3. **Extract conventions per layer:**
+   For each layer this phase touches, document:
+   - File/folder structure - where do these files live?
+   - Naming patterns - how are similar things named?
+   - Base classes/mixins - what should be extended?
+   - Common utilities - what helpers are typically used?
+   - Boilerplate patterns - what repeated structure appears?
+   - Dependency patterns - how are dependencies injected?
+
+4. **Verify pattern files exist:**
+   - Use Glob to confirm referenced files actually exist
+   - Read them to verify they're appropriate templates
 
 ### Step 3: Deep Research (Slices)
 
 For each area this phase touches:
 
-1. **Find entry points** - where does this functionality start?
-2. **Trace the code path** - follow imports, calls, inheritance
-3. **Go deeper** - when you think you've found it, check one more level
-4. **Document what you find** - file paths, patterns, conventions
+**IMPORTANT: Checking skills is not negotiable. Skills may have domain-specific guidance, layer conventions, and patterns that inform your research. If you are considering not using skills, you are making a mistake. You MUST check and load all relevant skills. You MUST read the relevant documents in the skills or you WILL fail.**
 
-**Stop when:**
-- You've hit concrete implementation (not abstractions)
-- You understand how data flows through the relevant layers
-- You know which files to modify/create and what patterns to follow
+1. **Invoke relevant skills (MANDATORY)** - Before researching each area, check if skills have guidance for:
+   - This specific layer or domain
+   - Common patterns for this type of functionality
+   - Conventions that affect how you should trace the code
+
+**IMPORTANT: Searching the codebase is not negotiable. The codebase has existing patterns and implementations that you require to do this job properly. If you are considering not searching, you are making a mistake. You MUST search deeply using Glob/Grep/Read or you WILL fail.**
+
+2. **Search codebase deeply (MANDATORY):**
+
+   a. **Find entry points** - where does this functionality start?
+   b. **Trace the code path** - follow imports, calls, inheritance
+   c. **Go deeper** - when you think you've found it, check one more level
+   d. **Try alternative searches** - if a search finds nothing, try different terms, patterns, file locations
+
+   **Stop searching when:**
+   - You've hit concrete implementation (not abstractions)
+   - You understand how data flows through the relevant layers
+   - You know which files to modify/create and what patterns to follow
+
+   **Do NOT stop when:**
+   - First search returns nothing (search differently)
+   - You found an abstraction (trace to concrete)
+   - You found something "close enough" (verify it's actually the pattern)
+
+3. **Document what you find** - file paths, patterns, conventions. Use structural references (class names, method names, relative positions) rather than line numbers, which become stale.
 
 ### Step 4: Write the Implementation Plan
 
@@ -174,6 +202,18 @@ PHASE PLAN FAILED
 Reason: [why]
 ```
 
+---
+
+## How to Load a Skill
+
+1. **Invoke the skill** using the Skill tool - this returns an **index** of reference files, NOT the full content
+2. **Read the index** to see what reference files are available and what each covers
+3. **Identify which reference files are relevant** to the current research area
+4. **Read only the relevant reference files** using the Read tool
+5. Use this content to guide your pattern discovery and deep research
+
+---
+
 ## Rules
 
 - **Go deep** - Don't stop at abstractions. Trace to concrete code.
@@ -183,3 +223,4 @@ Reason: [why]
 - **Be specific** - Vague steps lead to vague implementations.
 - **In fix mode** - Read the audit report, address all issues while maintaining overall quality.
 - **Minimal return** - Only return the signal, not the full plan content.
+- **No line numbers** - Line numbers change as code evolves; describe positions using structural references (function/class/method names, relative position like "after the constructor", or unique code patterns to search for).

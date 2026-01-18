@@ -145,17 +145,15 @@ Where `{provider}` is `glm` or `minimax` based on Step 0 selection. Note: `--mod
 ```
 Execute the build plan at: {build_plan_path}
 
-Read the build plan. It contains all instructions on how to execute, including which skills to load and how to use them. Follow it exactly.
+When complete, return:
 
-When complete, return EXACTLY one of:
-
-Success:
 PHASE COMPLETE
-Tasks: [number of tasks completed]
+Tasks: [count]
 
-Failure:
+Or if blocked:
+
 PHASE FAILED
-Reason: [specific reason]
+Reason: [why]
 ```
 
 ### Step 2: Execute via Bash
@@ -325,17 +323,17 @@ Execute the build plan at: {build_plan_path}
 
 {failure_reason}
 
-Continue from where the previous attempt failed. The build plan contains all instructions including skills to load. Follow it exactly.
+Continue from where the previous attempt failed.
 
-When complete, return EXACTLY one of:
+When complete, return:
 
-Success:
 PHASE COMPLETE
-Tasks: [number of tasks completed]
+Tasks: [count]
 
-Failure:
+Or if blocked:
+
 PHASE FAILED
-Reason: [specific reason]
+Reason: [why]
 ```
 
 ### Retry Output (after temper failure)
@@ -343,25 +341,21 @@ Reason: [specific reason]
 ```
 Execute the build plan at: {build_plan_path}
 
-## Previous Failure
-
-Execution completed but failed verification.
-
-## Failed Criteria
+## Failed Verification
 
 {failed_criteria}
 
-Fix the issues above. The build plan contains instructions and skills to help you fix correctly. Follow it exactly.
+Fix the issues above.
 
-When complete, return EXACTLY one of:
+When complete, return:
 
-Success:
 PHASE COMPLETE
-Tasks: [number of tasks completed]
+Tasks: [count]
 
-Failure:
+Or if blocked:
+
 PHASE FAILED
-Reason: [specific reason]
+Reason: [why]
 ```
 
 **If max retries exceeded:**
