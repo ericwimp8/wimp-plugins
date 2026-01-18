@@ -196,8 +196,13 @@ Where the answer is NO, note:
 
 For each confirmed blocker (NOT for statements you want to verify):
 
-1. **Check skills first** - Invoke relevant skills, read the index, then read referenced files for actual content
-2. **Search codebase** - Use Glob/Grep/Read to find patterns or implementations
+**IMPORTANT: Checking skills is not negotiable. They have information and patterns that you require to do this job properly. If you are considering not using skills, you are making a mistake. You MUST check and load all of the relevant skills. You MUST read the relevant documents in the skills or you WILL fail.**
+
+1. **Invoke relevant skills (MANDATORY)** - You MUST invoke relevant skills before creating any Open Question. Read the index, then read referenced files for actual content
+
+**IMPORTANT: Searching the codebase is not negotiable. The codebase has existing patterns and implementations that you require to do this job properly. If you are considering not searching, you are making a mistake. You MUST search for similar patterns using Glob/Grep/Read or you WILL fail.**
+
+2. **Search codebase (MANDATORY)** - You MUST search the codebase using Glob/Grep/Read to find patterns or implementations before creating any Open Question
 3. **Synthesize:**
    - Found answer → Suggestion (with evidence)
    - No answer found → Open Question
