@@ -51,7 +51,7 @@
     },
     {
       "name": "token-furnace",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "source": "./token-furnace",
       "description": "Implementation workflow that burns tokens liberally for thorough planning and execution"
     }
