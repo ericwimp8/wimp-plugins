@@ -254,13 +254,15 @@ Invoke prospector
         ↓
 Receive output (CHANGES, COMPLETE, or FAILED)
         ↓
-If CHANGES: log what was done, invoke prospector again
+Output prospector response to chat verbatim
+        ↓
+If CHANGES: invoke prospector again
 If COMPLETE: exit loop (no more gaps to find)
-If FAILED: report error to user, exit loop
+If FAILED: exit loop
         ↓
 Repeat up to 4 times (or until COMPLETE)
         ↓
-Tell user: "Prospector complete. [summary of changes]. Proceeding to clarification."
+Tell user: "Prospector complete. Proceeding to clarification."
         ↓
 Proceed to Phase B
 ```
