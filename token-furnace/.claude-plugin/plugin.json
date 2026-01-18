@@ -1,6 +1,6 @@
 {
   "name": "token-furnace",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Implementation workflow that burns tokens liberally to ensure thorough planning and successful execution. Phases: Intake (gather requirements), Clarification (find gaps), Planning, and Implementation.",
   "author": {
     "name": "Eric Wimp"

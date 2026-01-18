@@ -2,6 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+**MANDATORY**: When bumping plugin versions, update BOTH `.claude-plugin/marketplace.json` AND the plugin's `.claude-plugin/plugin.json`.
 
 ## Orchestrator ↔ Agent Communication Contract
 
