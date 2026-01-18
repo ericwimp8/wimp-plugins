@@ -10,6 +10,7 @@
   "plugins": [
     {
       "name": "test-writer-dart",
+      "version": "1.0.0",
       "source": "./",
       "description": "Test generation for Dart and Flutter with mocktail and Riverpod patterns",
       "commands": ["./test-writer-dart/commands", "./shared/commands"],
@@ -25,6 +26,7 @@
     },
     {
       "name": "test-writer-typescript",
+      "version": "1.0.0",
       "source": "./",
       "description": "Test generation for TypeScript with Jest and Firebase Functions patterns",
       "commands": ["./test-writer-typescript/commands", "./shared/commands"],
@@ -49,6 +51,7 @@
     },
     {
       "name": "token-furnace",
+      "version": "1.0.0",
       "source": "./token-furnace",
       "description": "Implementation workflow that burns tokens liberally for thorough planning and execution"
     }
