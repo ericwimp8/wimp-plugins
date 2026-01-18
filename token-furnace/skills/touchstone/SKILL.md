@@ -201,7 +201,21 @@ For each identified claim:
 
 **IMPORTANT: Searching the codebase is not negotiable. The codebase has existing patterns and implementations that you require to do this job properly. If you are considering not searching, you are making a mistake. You MUST search for similar patterns using Glob/Grep/Read or you WILL fail.**
 
-2. **Search codebase (MANDATORY)** - You MUST search using Glob/Grep/Read to find the actual implementation
+2. **Search codebase deeply (MANDATORY):**
+
+   a. **Find entry points** - Search for where this functionality exists in the codebase
+   b. **Trace the code path** - Follow imports, calls, inheritance chains
+   c. **Go deeper** - When you find something relevant, check one more level
+   d. **Try alternative searches** - If a search finds nothing, try different terms, patterns, file locations
+
+   **Stop searching when:**
+   - You've found concrete implementation with specific file:line evidence
+   - OR you've exhausted at least 3 different search strategies
+
+   **Do NOT stop when:**
+   - First search returns nothing (search differently)
+   - You found an abstraction (trace to concrete)
+   - You found something "close enough" (verify it's actually the pattern)
 3. **Compare:**
    - Claim matches reality → Move on (no report)
    - Claim contradicts reality → Correction (with evidence)

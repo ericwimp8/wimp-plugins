@@ -147,7 +147,21 @@ For each fact-related Open Question:
 
 **IMPORTANT: Searching the codebase is not negotiable. The codebase has existing patterns and implementations that you require to do this job properly. If you are considering not searching, you are making a mistake. You MUST search for similar patterns using Glob/Grep/Read or you WILL fail.**
 
-2. **Search codebase (MANDATORY)** - You MUST search using Glob/Grep/Read to find the actual implementation
+2. **Search codebase deeply (MANDATORY):**
+
+   a. **Find entry points** - Search for where this functionality exists in the codebase
+   b. **Trace the code path** - Follow imports, calls, inheritance chains
+   c. **Go deeper** - When you find something relevant, check one more level
+   d. **Try alternative searches** - If a search finds nothing, try different terms, patterns, file locations
+
+   **Stop searching when:**
+   - You've found concrete implementation with specific file:line evidence
+   - OR you've exhausted at least 3 different search strategies
+
+   **Do NOT stop when:**
+   - First search returns nothing (search differently)
+   - You found an abstraction (trace to concrete)
+   - You found something "close enough" (verify it's actually the pattern)
 3. **Re-evaluate with fresh context:**
    - Now obvious (was wrong) → fix in spec, remove from Open Questions
    - Now obvious (was not a factual claim) → remove from Open Questions, no fix needed (it's a design decision or intended behavior, not misinformation)
@@ -172,7 +186,21 @@ For each claim identified in Step 2:
 
 **IMPORTANT: Searching the codebase is not negotiable. The codebase has existing patterns and implementations that you require to do this job properly. If you are considering not searching, you are making a mistake. You MUST search for similar patterns using Glob/Grep/Read or you WILL fail.**
 
-2. **Search codebase (MANDATORY)** - You MUST search using Glob/Grep/Read to find the actual implementation
+2. **Search codebase deeply (MANDATORY):**
+
+   a. **Find entry points** - Search for where this functionality exists in the codebase
+   b. **Trace the code path** - Follow imports, calls, inheritance chains
+   c. **Go deeper** - When you find something relevant, check one more level
+   d. **Try alternative searches** - If a search finds nothing, try different terms, patterns, file locations
+
+   **Stop searching when:**
+   - You've found concrete implementation with specific file:line evidence
+   - OR you've exhausted at least 3 different search strategies
+
+   **Do NOT stop when:**
+   - First search returns nothing (search differently)
+   - You found an abstraction (trace to concrete)
+   - You found something "close enough" (verify it's actually the pattern)
 3. **If the claim references a specific file path** - Use Glob to verify that file actually exists at that path
 4. **Compare claim to reality:**
    - Claim matches reality → Move on (no action)
