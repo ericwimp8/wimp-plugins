@@ -1,0 +1,16 @@
+{
+  "name": "workflow-system",
+  "version": "0.1.0",
+  "description": "Composable workflow orchestration for planning and implementing software jobs at varying scales",
+  "author": {
+    "name": "Eric Wimp"
+  },
+  "license": "MIT",
+  "keywords": [
+    "workflow",
+    "planning",
+    "implementation",
+    "orchestration",
+    "composable"
+  ]
+}
