@@ -51,7 +51,7 @@ For each part of the spec, ask: **"Do I have enough information to implement thi
 
 ### The Confidence Test
 
-After searching, ask: **"Can I point to a specific file, line, or skill reference file as evidence?"**
+After searching, ask: **"Can I point to a specific location using the path notation (e.g., `file → class → method`) or skill reference file as evidence?"**
 
 - **YES** → HIGH confidence. Implement directly.
 - **NO** → LOW confidence. Add to Open Questions.
@@ -89,9 +89,9 @@ WRONG:
 This is PROPOSAL MODE. You implement or add to Open Questions - never propose. STOP.
 
 RIGHT:
-1. Search codebase, find ErrorResponse type in `src/types.ts:45`
+1. Search codebase, find `src/types.ts → ErrorResponse`
 2. Evidence is clear and specific
-3. Add directly to spec: "Errors use ErrorResponse format (see src/types.ts)"
+3. Add directly to spec: "Errors use ErrorResponse format (see src/types.ts → ErrorResponse)"
 4. Report: Implemented - added error format reference
 ```
 
@@ -156,7 +156,7 @@ For each gap (both existing Open Questions and new gaps):
    d. **Try alternative searches** - If a search finds nothing, try different terms, patterns, file locations
 
    **Stop searching when:**
-   - You've found concrete implementation with specific file:line evidence
+   - You've found concrete implementation you can reference with path notation (e.g., `file → class → method`)
    - OR you've genuinely exhausted alternatives (different terms, patterns, locations) and nothing remains to try
 
    **Do NOT stop when:**

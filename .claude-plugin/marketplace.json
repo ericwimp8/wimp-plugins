@@ -54,6 +54,12 @@
       "version": "1.0.3",
       "source": "./token-furnace",
       "description": "Implementation workflow that burns tokens liberally for thorough planning and execution"
+    },
+    {
+      "name": "workflow-system",
+      "version": "0.1.0",
+      "source": "./workflow-system",
+      "description": "Composable workflow orchestration for planning and implementing software tasks at varying scales"
     }
   ]
 }

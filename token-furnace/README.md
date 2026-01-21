@@ -70,20 +70,24 @@ Token Furnace works best with **topical skills**—codebase-specific knowledge f
 
 1. **Organize** — Describe your idea in any form. Intake structures it and identifies gaps. For each gap, `ore-scout` researches your codebase instead of asking you. Loop continues until you say "ready to write."
 
-2. **Clarify** — `assayer` reads your spec as an implementer would, finding gaps that would block development. It attempts to fill gaps from skills/codebase, then presents:
+2. **Prospector (Autonomous)** — `prospector` autonomously fills gaps with high-confidence solutions found in your codebase. Iterates up to 4 times until COMPLETE.
+
+3. **Clarify** — `assayer` reads your spec as an implementer would, finding gaps that would block development. It uses a **WHAT vs HOW filter**: WHAT questions (requirements, outcomes) are flagged; HOW questions (implementation details) are deferred. It attempts to fill WHAT gaps from skills/codebase, then presents:
    - **Suggestions** — Gaps it found answers for (confirm/reject/modify)
    - **Questions** — Gaps needing your input
    - **Unanswered** — Existing open questions
 
    Loop continues until assayer returns `IMPLEMENTATION_READY`.
 
-3. **Verify** — `touchstone` fact-checks claims against your codebase, returning:
+4. **Refiner (Autonomous)** — `refiner` autonomously fixes obvious factual errors (wrong file paths, method names, return types). Iterates up to 4 times until COMPLETE.
+
+5. **Verify** — `touchstone` fact-checks claims against your codebase, returning:
    - **Corrections** — Claims contradicting evidence (confirm/reject/modify)
    - **Questions** — Claims needing clarification
 
    Loop continues until touchstone returns `VERIFIED`.
 
-4. **Structure** — `mold` reorganizes the spec into **vertical slices** (end-to-end features) instead of horizontal layers, ensuring no content is lost.
+6. **Structure** — `mold` reorganizes the spec into **vertical slices** (end-to-end features) instead of horizontal layers, ensuring no content is lost.
 
 **Outputs:**
 - `plans/[slug]/[slug]-spec.md` — Verified spec
@@ -108,9 +112,13 @@ Token Furnace works best with **topical skills**—codebase-specific knowledge f
    - Steps are ordered correctly
    - No gaps, vagueness, or scope creep
 
-   Returns `PASS` or `ISSUES`. If issues, you choose: retry (up to 3 attempts), accept anyway, or provide guidance.
+   Returns `PASS` or `ISSUES`.
 
-3. **proof** — Once slag-check passes, derives exhaustive success criteria from both spec and plan. Each criterion specifies exactly what to verify and how—checkable by reading code, not running it.
+3. **Automatic retry** — If issues found, automatically feeds issues back to deep-drill for up to 3 attempts without user intervention.
+
+4. **Human checkpoint** — After retries exhausted (if ISSUES) or on first PASS, user reviews and chooses: retry with guidance, accept anyway, or provide guidance.
+
+5. **proof** — Once approved, derives exhaustive success criteria from both spec and plan. Each criterion specifies exactly what to verify and how—checkable by reading code, not running it.
 
 **Output:** `plans/[slug]/phase-N-plan.md` for each phase
 
@@ -158,12 +166,15 @@ Token Furnace works best with **topical skills**—codebase-specific knowledge f
 
 Token Furnace integrates with **topical skills** at every major intersection:
 
-| Stage | Skill Consulted | Purpose |
+| Stage | Skill/Agent Consulted | Purpose |
 |-------|----------------|---------|
 | Intake | ore-scout | Research patterns instead of asking user |
-| Intake | assayer | Verify spec against skills for gaps |
+| Intake | prospector | Autonomously fill gaps with high-confidence solutions |
+| Intake | assayer | Find implementation-blocking gaps (WHAT, not HOW) |
+| Intake | refiner | Autonomously fix factual errors |
 | Intake | touchstone | Verify spec claims against codebase |
 | Smelter | deep-drill | Reference skills for pattern guidance |
+| Smelter | slag-check | Verify pattern files exist |
 | Foundry | cast | Assign skills to implementation tasks |
 | Forge | executor | Load skills before implementing |
 
@@ -197,9 +208,13 @@ plans/[slug]/
 
 Token Furnace includes strategic human-in-the-loop points:
 
-- **After organize** — You approve the structured spec before clarification
-- **After slag-check** — You review audit results and choose retry/accept/guidance
-- **After deep-drill** — You review the plan before proof adds success criteria
+- **After organize** — You approve the structured spec before autonomous loops run
+- **After prospector loop** — You see what was autonomously filled (output verbatim)
+- **During clarification** — You respond to assayer questions (loop until IMPLEMENTATION_READY)
+- **After refiner loop** — You see summary of autonomous corrections
+- **During verification** — You respond to touchstone corrections (loop until VERIFIED)
+- **After automatic retry exhausted** — You review audit results and choose retry/accept/guidance
+- **On PASS checkpoint** — You review and approve the plan before proof adds success criteria
 - **After temper failure** — You can intervene after 3 retry attempts
 
 ---
@@ -210,8 +225,11 @@ Token Furnace works in conjunction with **topical skills**—codebase-specific k
 
 At every major intersection in the workflow, agents are pushed to consult skills:
 - **ore-scout** checks skills when researching patterns
+- **prospector** checks skills when autonomously filling gaps
 - **assayer** and **touchstone** verify against skills when auditing specs
+- **refiner** checks skills when fixing factual errors
 - **deep-drill** references skills when finding analogous implementations
+- **slag-check** verifies pattern files referenced in plans
 - **cast** assigns skills to tasks so executing agents follow the right patterns
 - **forge** loads skills before execution so the implementing agent knows the conventions
 
@@ -235,12 +253,18 @@ Turns messy thoughts into a verified, structured spec ready for implementation p
 
 **A. Organize** — The user dumps their thoughts. Intake organizes them into structure, identifies gaps, and for each gap invokes **ore-scout** to research the codebase rather than asking the user. Presents findings and options. Loops until the user says "ready to write", then writes the spec.
 
+**A2. Prospector Loop (Autonomous)** — Intake invokes **prospector** to autonomously fill gaps with high-confidence solutions. Prospector iterates up to 4 times until COMPLETE (no gaps left) or max iterations reached. Output is presented verbatim to the user.
+
 **B. Clarify** — Invokes **assayer** to read the spec as an implementer would. Assayer identifies blocking gaps (things that would prevent implementation), attempts to fill them from codebase/skills, and returns:
 - **Suggestions** — Gaps it found answers for (user confirms/rejects/modifies)
 - **Questions** — Gaps needing user input
 - **Unanswered** — Existing open questions from the spec
 
+Assayer uses a **WHAT vs HOW filter**: WHAT questions (requirements, outcomes) are treated as gaps; HOW questions (implementation details, patterns) are deferred to implementation.
+
 User responds, assayer applies changes to spec. Loop repeats with a fresh assayer until it returns IMPLEMENTATION_READY or COMPLETE.
+
+**B2. Refiner Loop (Autonomous)** — Intake invokes **refiner** to autonomously fix obvious factual errors in the spec. Refiner iterates up to 4 times until COMPLETE (nothing left to fix), then summarizes corrections made.
 
 **C. Verify** — Invokes **touchstone** to fact-check the spec. Touchstone verifies claims against the codebase and returns:
 - **Corrections** — Claims that contradict evidence (user confirms/rejects/modifies)
@@ -272,13 +296,13 @@ For each phase in the phases file:
 
    Returns PASS or ISSUES.
 
-3. **Human checkpoint** —
-   - If ISSUES: User sees the issues and chooses to retry (deep-drill runs again with feedback), accept anyway, or provide guidance.
+3. **Automatic retry** — If ISSUES, automatically feeds issues back to deep-drill for up to 3 attempts without user intervention.
+
+4. **Human checkpoint** —
+   - If retries exhausted (still ISSUES): User chooses to retry with guidance, accept anyway, or provide guidance.
    - If PASS: User reviews the plan and confirms or requests changes.
 
-   Retry loop runs up to 3 attempts before escalating.
-
-4. **proof** — Once slag-check passes, derives exhaustive success criteria from both spec and plan. Each criterion specifies exactly what to verify and how—checkable by reading code, not running it.
+5. **proof** — Once approved, derives exhaustive success criteria from both spec and plan. Each criterion specifies exactly what to verify and how—checkable by reading code, not running it.
 
 **Output:** `plans/[slug]/phase-N-plan.md` for each phase, each with a Success Criteria section.
 
@@ -331,4 +355,20 @@ For each build plan:
    - Up to 3 total attempts before escalating to user
 
 **Output:** Implemented code, verified against all success criteria derived from spec and plan.
+
+---
+
+## Recent Changes
+
+### January 2026
+
+- **WHAT vs HOW Filter** — Added to `assayer` and `prospector` skills to prevent treating implementation details (HOW) as gaps. Only requirements and outcomes (WHAT) are flagged as needing clarification.
+
+- **Prospector/Refiner Autonomous Loops** — Added autonomous gap-filling (`prospector`) and error-fixing (`refiner`) loops to intake workflow. Each iterates up to 4 times until COMPLETE, reducing user friction for obvious fixes.
+
+- **Automatic Retry in Smelter** — `deep-drill` now automatically retries up to 3 times when `slag-check` finds issues, without user intervention. Human checkpoint only occurs after retries are exhausted or on first PASS.
+
+- **Cast Agent Rewrite** — `cast` agent now preserves all phase plan data (Pattern Reference, Architectural Impact, Dependencies, Open Questions) in build plans, making them fully self-contained for execution.
+
+- **Prospector Verbatim Output** — Intake now outputs prospector response verbatim to chat, showing exactly what was autonomously filled.
 

@@ -10,11 +10,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Why
 
-Prevents orchestrators/agents from adding "helpful" context that causes prompt drift and miscommunication. Both sides agree on exactly what is sent and received.
+Prevents orchestrators/agents from adding "helpful" context that causes prompt drift and miscommunication. Each side owns and documents their own output shape.
 
 ### Pattern
 
-**Agents** define `## Input` and `## Output` sections:
+**Each sender owns their output shape.** No duplication across files.
+
+**Agents** define `## Input` (what they receive) and `## Output` (what they return):
 ```
 ## Input
 File: path to the file
@@ -25,34 +27,18 @@ COMPLETE
 Result: [description of outcome]
 ```
 
-**Orchestrators** define `## Output` and `## Expected Response` sections:
+**Orchestrators** define `## Output` (what they send to agents):
 ```
 ## Output
 File: path to the file
 Action: what to do
-
-## Expected Response
-COMPLETE
-Result: [description of outcome]
 ```
 
-Note: The Orchestrator's `## Output` and Agent's `## Input` are identical. The Agent's `## Output` and Orchestrator's `## Expected Response` are identical.
+The orchestrator's `## Output` must match the agent's `## Input`. The agent owns the definition of what it returns - orchestrators read the agent's `## Output` section to know what to expect.
 
 ### Example
 
 An orchestrator calling a test-writing agent:
-
-**In `write-tests.md` (orchestrator):**
-```markdown
-## Output
-File: path to file under test
-Skills: comma-separated list of skills to use
-
-## Expected Response
-COMPLETE
-TestFile: [path to generated test file]
-Cases: [number of test cases written]
-```
 
 **In `tw-write-test.md` (agent):**
 ```markdown
@@ -66,16 +52,23 @@ TestFile: [path to generated test file]
 Cases: [number of test cases written]
 ```
 
-The fields match exactly - verifiable by diffing the two files.
+**In `write-tests.md` (orchestrator):**
+```markdown
+## Output
+File: path to file under test
+Skills: comma-separated list of skills to use
+```
+
+The orchestrator sends what matches the agent's `## Input`. The agent's `## Output` is the source of truth for what comes back.
 
 ### Rules
 
-1. **Contracts must match** - Orchestrator's `## Output` must match Agent's `## Input` (same fields, same format)
-2. **Responses must match** - Agent's `## Output` must match Orchestrator's `## Expected Response` (same fields, same format)
-3. **Labeled fields** - Always `Field: value` format
-4. **No extra instructions** - Use templates exactly as written
-5. **Structured signals** - Return parseable signals (COMPLETE, FAILED, PASS, ISSUES)
-6. **Verifiable** - If contracts don't match, the contract is broken
+1. **Sender owns output** - Each side documents only what they send, not what they receive
+2. **Orchestrator → Agent match** - Orchestrator's `## Output` must match Agent's `## Input`
+3. **Agent owns response format** - Orchestrators reference the agent's `## Output` for response handling
+4. **Labeled fields** - Always `Field: value` format
+5. **No extra instructions** - Use templates exactly as written
+6. **Structured signals** - Return parseable signals (COMPLETE, FAILED, PASS, ISSUES)
 
 ### Optional Fields (Multiple Modes)
 

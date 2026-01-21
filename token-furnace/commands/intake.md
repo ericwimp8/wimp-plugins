@@ -14,7 +14,6 @@ You help users get ideas out of their head and into a structured document, then 
 Before beginning intake, check if the user has generated codebase skills.
 
 Use `AskUserQuestion`:
-
 ```json
 {
   "questions": [
@@ -84,7 +83,6 @@ When the user dumps their initial thoughts:
 5. Present your organized understanding + options for gaps
 
 ### Ongoing Loop
-
 ```
 User provides input
         ↓
@@ -132,13 +130,11 @@ Invoke the `token-furnace:ore-scout` agent using the Task tool.
 **MANDATORY**: Use the contract below exactly.
 
 ## Output
-
 ```
 Question: specific question about the codebase
 ```
 
 ## Expected Response
-
 ```
 ## Answer
 
@@ -199,7 +195,6 @@ If the directory does not exist, create it.
 **Full path example:** `plans/user-auth/user-auth-spec.md`
 
 ### Format
-
 ```markdown
 # [Project/Feature Name]
 
@@ -244,7 +239,6 @@ If the directory does not exist, create it.
 After writing the spec, run prospector to autonomously fill gaps before involving the user.
 
 ### The Loop
-
 ```
 [Spec written]
         ↓
@@ -271,48 +265,18 @@ Proceed to Phase B
 
 Invoke the `token-furnace:prospector` agent using the Task tool.
 
-**MANDATORY**: Use the contract below exactly.
-
-## Output
-
+**Input:**
 ```
 Document: absolute path to spec file
 ```
 
-## Expected Response
-
-**When changes made:**
-```
-CHANGES
-Document: [path]
-Implemented: [count]
-Added to Open Questions: [count]
-Resolved from Open Questions: [count]
-
-Implemented:
-- [What was added and where] ← [evidence]
-
-Added to Open Questions:
-- [Gap]: [description of missing information]
-
-Resolved from Open Questions:
-- [Question that was answered] ← [evidence]
-```
-
-**When no gaps found (nothing left to fill):**
-```
-COMPLETE
-Document: [path]
-Remaining Open Questions: [count]
-```
-
-This signals the orchestrator to stop iterating and proceed to assayer. Any remaining Open Questions are for user review.
-
-**When document not found:**
-```
-FAILED
-Reason: Document not found at [path]
-```
+**Handle response:**
+- Parse signal: `CHANGES` | `COMPLETE` | `FAILED`
+- Track counts: Implemented, Added to Open Questions, Resolved from Open Questions
+- Output response to chat verbatim
+- If `CHANGES` → loop again
+- If `COMPLETE` → exit loop, proceed to Phase B
+- If `FAILED` → exit loop, report error to user
 
 ### Handling Prospector Output
 
@@ -345,7 +309,6 @@ Then proceed to Phase B (Clarification Loop).
 After writing the document, immediately begin the clarification loop.
 
 ### The Loop
-
 ```
 [Document written]
         ↓
@@ -408,8 +371,7 @@ Invoke the assayer using the Bash tool with `claude -p`.
 
 **IMPORTANT**: The Task tool has a known regression with resume when agents use tools. Use `claude -p` directly until this is fixed.
 
-## Output
-
+**Input:**
 ```
 Document: absolute path to spec file
 ```
@@ -424,64 +386,10 @@ claude -p "Use the Skill tool to invoke 'token-furnace:assayer' with the Documen
 
 **Capture the `session_id` from the JSON output** - you'll need it for Phase 2.
 
-## Expected Response
-```markdown
-## Document Reviewed
-
-[Path to document]
-
-## Suggestions (gaps where I found the missing info)
-
-[If none: "None - no gaps found that I could fill"]
-
-### S1: [What's missing]
-
-**Blocker:** [What I couldn't implement without this]
-**Found:** [What I found in skills/codebase]
-**Evidence:**
-- Skill: `[skill]/[file]` - [detail]
-- File: `[path]` - [detail]
-**Suggested addition:** [What should be added to the spec]
-
----
-
-### S2: ...
-
-## Open Questions (gaps needing user input)
-
-[If none: "None - no gaps requiring user input"]
-
-### Q1: [What's missing]
-
-**Blocker:** [What I couldn't implement without this]
-**Question:** [Specific question to resolve it]
-
----
-
-### Q2: ...
-
-## Unanswered Open Questions (from spec's Open Questions section)
-
-[If none: "None - spec has no Open Questions section"]
-
-### UO1: [Title from spec]
-
-**Question:** [As written in spec]
-
----
-
-### UO2: ...
-
-## Status
-
-[NEEDS_CLARIFICATION | IMPLEMENTATION_READY | COMPLETE]: [summary]
-```
-
-Handle the output:
-- **Suggestions**: Gaps where assayer found answers in the codebase - user confirms, rejects (with or without reason), or modifies
-- **Open Questions**: New gaps requiring user input - user provides answer or skips
-- **Unanswered Open Questions**: Existing gaps from spec's Open Questions section - user provides answer or skips
-- **Status**: Determines whether to continue the loop or exit
+**Handle response:**
+- Parse sections: Suggestions (S1, S2...), Open Questions (Q1, Q2...), Unanswered Open Questions (UO1, UO2...), Status
+- If Status is `IMPLEMENTATION_READY` or `COMPLETE` → exit loop, proceed to Phase B2
+- If Status is `NEEDS_CLARIFICATION` → present to user verbatim, continue loop
 
 ### Formatting Answers
 
@@ -535,26 +443,6 @@ Resume the assayer using `claude -p --resume` with the session ID from Phase 1.
 
 The skill is already loaded from Phase 1 - just send the formatted input.
 
-## Output
-
-```
-Document: absolute path to spec file
-
-Suggestions:
-- S1: [title] → confirmed
-- S2: [title] → rejected: [reason]
-- S3: [title] → rejected
-- S4: [title] → modified: [user's version]
-
-Questions:
-- Q1: [title] → [user's answer]
-- Q2: [title] → unanswered
-
-Unanswered:
-- UO1: [title] → [user's answer]
-- UO2: [title] → unanswered
-```
-
 **Command template:**
 ```bash
 claude -p "Document: {document_path}
@@ -573,24 +461,10 @@ Unanswered:
   --output-format json
 ```
 
-## Expected Response
-
-```
-Document: [path]
-Result: UPDATED | NO_CHANGES
-Changes: [count]
-Added to Open Questions: [count]
-Skipped: [count]
-
-Changes:
-- [ID]: [What was added/changed and where]
-
-Added to Open Questions:
-- [ID]: [Description]
-
-Skipped:
-- [ID]: unanswered (remains in Open Questions)
-```
+**Handle response:**
+- Parse: Result (`UPDATED` | `NO_CHANGES`), Changes count, Added to Open Questions count, Skipped count
+- Present summary to user
+- Invoke NEW assayer (Phase 1) for next iteration
 
 ### Exit Condition
 
@@ -599,7 +473,6 @@ The loop ends when assayer Phase 1 returns:
 - **COMPLETE**: No gaps found - document is comprehensive
 
 **Before proceeding to Phase B2**, check if the spec still has items in its Open Questions section. If so, warn the user:
-
 ```
 "The spec is ready for implementation, but [N] open questions remain unanswered:
 [List the open questions from the spec]
@@ -620,7 +493,6 @@ Then proceed to Phase B2 (Refiner Loop).
 After clarification completes, run refiner to autonomously fix obvious factual errors before involving the user.
 
 ### The Loop
-
 ```
 [Clarification complete - assayer returned IMPLEMENTATION_READY or COMPLETE]
         ↓
@@ -645,48 +517,17 @@ Proceed to Phase B3
 
 Invoke the `token-furnace:refiner` agent using the Task tool.
 
-**MANDATORY**: Use the contract below exactly.
-
-## Output
-
+**Input:**
 ```
 Document: absolute path to spec file
 ```
 
-## Expected Response
-
-**When changes made:**
-```
-CHANGES
-Document: [path]
-Corrected: [count]
-Added to Open Questions: [count]
-Resolved from Open Questions: [count]
-
-Corrected:
-- [Spec said → Changed to] ← [evidence]
-
-Added to Open Questions:
-- [Fact]: [claim] vs [reality] - [why ambiguous]
-
-Resolved from Open Questions:
-- [Question that was resolved] ← [evidence]
-```
-
-**When no errors found (nothing left to fix):**
-```
-COMPLETE
-Document: [path]
-Remaining Open Questions: [count]
-```
-
-This signals the orchestrator to stop iterating and proceed to touchstone. Any remaining `[Fact]:` Open Questions are for user review.
-
-**When document not found:**
-```
-FAILED
-Reason: Document not found at [path]
-```
+**Handle response:**
+- Parse signal: `CHANGES` | `COMPLETE` | `FAILED`
+- Track counts: Corrected, Added to Open Questions, Resolved from Open Questions
+- If `CHANGES` → loop again
+- If `COMPLETE` → exit loop, proceed to Phase B3
+- If `FAILED` → exit loop, report error to user
 
 ### Handling Refiner Output
 
@@ -719,7 +560,6 @@ Then proceed to Phase B3 (Verification Loop).
 After the refiner loop completes, verify remaining claims with user input.
 
 ### The Loop
-
 ```
 [Refiner complete - refiner returned COMPLETE or ran 4 times]
         ↓
@@ -778,8 +618,7 @@ Invoke the touchstone using the Bash tool with `claude -p`.
 
 **IMPORTANT**: The Task tool has a known regression with resume when agents use tools. Use `claude -p` directly until this is fixed.
 
-## Output
-
+**Input:**
 ```
 Document: absolute path to spec file
 ```
@@ -794,54 +633,10 @@ claude -p "Use the Skill tool to invoke 'token-furnace:touchstone' with the Docu
 
 **Capture the `session_id` from the JSON output** - you'll need it for Phase 2.
 
-## Expected Response
-```markdown
-## Document Reviewed
-
-[Path to document]
-
-## Corrections (claims that contradict evidence)
-
-[If none: "None - all verified claims are accurate"]
-
-### C1: [The incorrect claim]
-
-**Spec says:** [Quote from spec]
-**Actually:** [What the evidence shows]
-**Evidence:**
-- File: `[path]:[line]` - [what it shows]
-- Skill: `[skill]/[file]` - [what it shows]
-**Suggested correction:** [How to fix the spec]
-
----
-
-### C2: ...
-
-## Questions (claims needing clarification)
-
-[If none: "None - no claims requiring clarification"]
-
-### Q1: [The unclear claim]
-
-**Spec says:** [Quote from spec]
-**Concern:** [Why this seems wrong or inconsistent]
-**Question:** [Specific question to resolve it]
-
----
-
-### Q2: ...
-
-## Status
-
-[One of:]
-- NEEDS_CORRECTION: [N] corrections, [M] questions
-- VERIFIED: All verifiable claims checked out (or no verifiable claims found)
-```
-
-Handle the output:
-- **Corrections**: Claims where touchstone found contradictions - user confirms, rejects (with or without reason), or modifies
-- **Questions**: Claims needing user clarification - user provides answer or skips
-- **Status**: Determines whether to continue the loop or exit
+**Handle response:**
+- Parse sections: Corrections (C1, C2...), Questions (Q1, Q2...), Status
+- If Status is `VERIFIED` → exit loop, proceed to Phase C
+- If Status is `NEEDS_CORRECTION` → present to user verbatim, continue loop
 
 ### Formatting Answers
 
@@ -886,22 +681,6 @@ Resume the touchstone using `claude -p --resume` with the session ID from Phase 
 
 The skill is already loaded from Phase 1 - just send the formatted input.
 
-## Output
-
-```
-Document: absolute path to spec file
-
-Corrections:
-- C1: [title] → confirmed
-- C2: [title] → rejected: [reason]
-- C3: [title] → rejected
-- C4: [title] → modified: [user's version]
-
-Questions:
-- Q1: [title] → [user's answer]
-- Q2: [title] → unanswered
-```
-
 **Command template:**
 ```bash
 claude -p "Document: {document_path}
@@ -917,24 +696,10 @@ Questions:
   --output-format json
 ```
 
-## Expected Response
-
-```
-Document: [path]
-Result: UPDATED | NO_CHANGES
-Corrections applied: [count]
-Added to Open Questions: [count]
-Skipped: [count]
-
-Applied:
-- [ID]: [What was corrected and where]
-
-Added to Open Questions:
-- [ID]: [Description]
-
-Skipped:
-- [ID]: unanswered (added to Open Questions)
-```
+**Handle response:**
+- Parse: Result (`UPDATED` | `NO_CHANGES`), Corrections applied count, Added to Open Questions count, Skipped count
+- Present summary to user
+- Invoke NEW touchstone (Phase 1) for next iteration
 
 ### Exit Condition
 
@@ -942,7 +707,6 @@ The loop ends when touchstone Phase 1 returns:
 - **VERIFIED**: All verifiable claims checked out (or no verifiable claims found)
 
 **Before proceeding to Phase C**, check if the spec still has items in its Open Questions section. If so, warn the user:
-
 ```
 "Verification complete, but [N] open questions remain in the spec:
 [List the open questions from the spec]
@@ -966,38 +730,16 @@ After clarification and verification complete, derive implementation phases from
 
 Invoke the `token-furnace:mold` agent using the Task tool.
 
-**MANDATORY**: Use the contract below exactly.
-
-## Output
-
+**Input:**
 ```
 Spec path: absolute path to the spec file to restructure
 ```
 
-## Expected Response
-
-**Success:**
-```
-MOLD COMPLETE
-Phases: [count]
-Output: [path]
-
-COMPARATIVE AUDIT RESULTS:
-[audit details]
-
-AUDIT RESULT: PASS
-```
-
-**Failure:**
-```
-MOLD FAILED
-Reason: [why]
-
-COMPARATIVE AUDIT RESULTS:
-[audit details]
-
-AUDIT RESULT: FAIL
-```
+**Handle response:**
+- Parse signal: `MOLD COMPLETE` | `MOLD FAILED`
+- Parse audit: `AUDIT RESULT: PASS` | `AUDIT RESULT: FAIL`
+- If both pass → read phases file, present to user
+- If either fails → report issues to user, spec needs review
 
 ### Handling Mold Output
 
@@ -1010,7 +752,6 @@ AUDIT RESULT: FAIL
 ### Completion
 
 When mold completes successfully, report to the user:
-
 ```
 ## Intake Complete
 
@@ -1026,40 +767,4 @@ When mold completes successfully, report to the user:
 **Status:** Ready for implementation planning
 
 **Next step:** Run smelter to begin implementation planning
-```
-
----
-
-## Summary
-
-```
-User dumps thoughts
-        ↓
-    [Phase A: Organize Loop]
-    Organize → Research (ore-scout) → Suggest → Repeat
-        ↓
-User says "ready"
-        ↓
-    [Write Spec]
-        ↓
-    [Phase A2: Prospector Loop]
-    Prospector → (CHANGES? repeat, up to 4x) → COMPLETE → exit
-        ↓
-    [Phase B: Clarification Loop]
-    Assayer (Phase 1) → Present → User answers → Resume Assayer (Phase 2) → Report → NEW Assayer → Repeat
-        ↓
-Assayer returns IMPLEMENTATION_READY or COMPLETE
-        ↓
-    [Phase B2: Refiner Loop]
-    Refiner → (CHANGES? repeat, up to 4x) → COMPLETE → exit
-        ↓
-    [Phase B3: Verification Loop]
-    Touchstone (Phase 1) → Present → User answers → Resume Touchstone (Phase 2) → Report → NEW Touchstone → Repeat
-        ↓
-Touchstone returns VERIFIED
-        ↓
-    [Phase C: Structure]
-    Mold → Present phases → User confirms
-        ↓
-    [Report completion with spec + phases links, suggest smelter]
 ```

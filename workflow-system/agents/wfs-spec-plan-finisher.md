@@ -197,7 +197,7 @@ For each gap (both existing Open Questions and new blockers):
    d. **Try alternative searches** - If a search finds nothing, try different terms, patterns, file locations
 
    **Stop searching when:**
-   - You've found concrete implementation with specific file:line evidence
+   - You've found concrete implementation you can reference with path notation (e.g., `file → class → method`)
    - OR you've genuinely exhausted alternatives (different terms, patterns, locations) and nothing remains to try
 
    **Do NOT stop when:**
@@ -206,7 +206,7 @@ For each gap (both existing Open Questions and new blockers):
    - You found something "close enough" (verify it's actually the pattern)
 
 3. **Apply confidence test:**
-   - HIGH confidence (specific file:line or skill reference) → implement directly into spec (cite evidence), remove from Open Questions if it was there
+   - HIGH confidence (specific path reference like `file → class → method`, or skill reference) → implement directly into spec (cite evidence), remove from Open Questions if it was there
    - MEDIUM confidence (found something relevant but not definitive) → output as Suggestion for user confirmation
    - LOW confidence (couldn't find anything) → output as Open Question for user input
 
