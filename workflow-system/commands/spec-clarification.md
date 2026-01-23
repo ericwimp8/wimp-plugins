@@ -17,6 +17,20 @@ Document: absolute path to spec file
 
 ---
 
+## Checkpoint
+
+### Why
+
+This command runs multi-step loops that can be interrupted by compaction or failure. Without a checkpoint, you'd lose track of progress—document path, which phase you're in, iteration counts, agent IDs for resumption. The checkpoint task lets you (or a parent command) pick up exactly where you left off.
+
+### How
+
+**MANDATORY**: Create a progress task immediately with subject starting: `Tracking /spec-clarification`
+
+Keep it updated throughout with enough context to fully resume—document path, current phase, iteration counts, agent IDs. Update at every significant step. Mark complete when finished.
+
+---
+
 ## Your Role
 
 **Phase 1 - Auto-fill:**
@@ -37,11 +51,15 @@ Document: absolute path to spec file
 ```
 [Document provided]
         ↓
+**Create checkpoint**
+        ↓
 Tell user: "Running clarifier to auto-fill gaps..."
         ↓
 Invoke clarifier
         ↓
 Receive output (CHANGES or COMPLETE)
+        ↓
+**Update checkpoint**
         ↓
 If CHANGES: output response verbatim, invoke clarifier again
 If COMPLETE: exit loop
@@ -49,6 +67,8 @@ If COMPLETE: exit loop
 Repeat up to 4 times (or until COMPLETE)
         ↓
 Tell user: "Auto-fill complete. Proceeding to human review."
+        ↓
+**Update checkpoint**
         ↓
 Proceed to Phase 2
 ```
@@ -99,6 +119,8 @@ Tell user: "Starting human review to find remaining gaps."
         ↓
 Invoke NEW finisher (Phase 1)
         ↓
+**Update checkpoint**
+        ↓
 Receive finisher output (Implemented + Suggestions + Open Questions + Status)
         ↓
 If Status is COMPLETE → Exit, report success
@@ -109,11 +131,15 @@ Present finisher output to user VERBATIM (DO NOT SUMMARIZE - copy full output ex
         ↓
 User responds
         ↓
+**Update checkpoint**
+        ↓
 Format answers for finisher (see Formatting Answers below)
         ↓
 RESUME finisher (Phase 2) with formatted answers
         ↓
 Receive report (Result, Changes, Added to Open Questions, Skipped)
+        ↓
+**Update checkpoint**
         ↓
 Present to user:
   "Spec updated.
@@ -211,6 +237,8 @@ The loop ends when finisher Phase 1 returns:
 ---
 
 ## Completion
+
+**Mark checkpoint complete.**
 
 When the loop completes, report to the user:
 ```

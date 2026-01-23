@@ -13,20 +13,11 @@ The orchestrators are independent and composable. There are two paths:
 | Easy | implementation-planner → implementation-execution | Outline is good enough, just needs organising and doing |
 | Complex | spec-planner → implementation-planner → implementation-execution | Needs detailed spec work first |
 
-Size (small/medium/large) falls out naturally from the sizing judgments in implementation-planner. It produces:
-- 1 phase with 1 job (small work)
-- 1 phase with multiple jobs (medium work)
-- Multiple phases with multiple jobs (large work)
-
-No size labels or signals needed - the structure reflects the actual work.
-
 ---
 
 ## Standard Feedback Loop Pattern
 
 Used throughout the system: spec-planner loops, implementation planning, and implementation execution.
-
-**Note:** Agent names referenced throughout (Prospector, Assayer, Deep-drill, Slag-check, etc.) are examples of similar functionality from existing systems. They will be rewritten with differences for this workflow system.
 
 ```
 Worker Agent → Checker Agent → [AUTO-RETRY × N] → HUMAN-IN-LOOP
@@ -45,91 +36,71 @@ Worker Agent → Checker Agent → [AUTO-RETRY × N] → HUMAN-IN-LOOP
 
 ---
 
-## Orchestrator: spec-planner
+## Orchestrator: spec-planner ✓ DONE
 
 **Purpose:** Take a user's plan mode output and refine it into a highly detailed spec document.
 
-**Deliverable:** A detailed spec document covering everything down to the smallest detail.
+**Deliverable:** A detailed spec document at `plans/[feature-slug]/[feature-slug]-spec.md`
 
-This isn't exactly what we need but it is a good example of how the loop works.
+**Implementation:** Two slash commands in `workflow-system/commands/`:
 
-### Loops
+### /spec-clarification
 
-Uses the standard feedback loop pattern (see below):
-- Prospector → Assayer (auto-retry, then human-in-loop) *(example - will be rewritten)*
-- Refiner → Touchstone (auto-retry, then human-in-loop) *(example - will be rewritten)*
+Handles gap-filling:
+1. **Auto-fill loop** - `wfs-spec-plan-clarifier` runs up to N times, auto-filling gaps
+2. **Human-in-loop** - `wfs-spec-plan-finisher` finds remaining gaps, presents to user, applies answers
+
+### /spec-verification
+
+Handles fact-checking:
+1. **Auto-fix loop** - `wfs-spec-plan-fact-checker` runs up to N times, fixing obvious errors
+2. **Human-in-loop** - `wfs-spec-plan-verifier` finds remaining issues, presents to user, applies corrections
 
 ---
 
 ## Orchestrator: implementation-planner
 
-**Purpose:** Take a detailed spec and break it down into executable implementation plans organised by phase and job.
+**Purpose:** Take a detailed spec and produce executable implementation plans.
 
 **Deliverables:**
-- Phase-spec documents: `plans/[feature-slug]/phase-specs/[feature-slug]-[phase-slug]-spec.md`
-- Job-spec documents: `plans/[feature-slug]/phase-job-specs/[feature-slug]-[phase-slug]-job-spec.md`
-- Implementation plans: `plans/[feature-slug]/phase-implementation/[phase-slug]/[job-slug].md`
+- Job-spec document: `plans/[feature-slug]/[feature-slug]-job-spec.md`
+- Implementation plans: `plans/[feature-slug]/implementation/[job-slug].md`
 
-**Flexibility requirement:** This orchestrator needs to handle the full range - from a highly detailed spec covering a huge feature add, down to a plan mode spec that adds a button to a header. The sizing judgments at each step should make this work naturally without special handling.
+### Step 1: Job Spec Creation
 
-At this point we have a highly detailed spec document detailing how everything should be done down to the smallest detail.
+Agent: `wfs-job-spec-creator`
 
-### Phase Separation
+Takes the detailed spec and reorganizes it into a jobs document:
+- Single file output (not multiple phase files)
+- Jobs organized by dependency chain
+- Bias toward fewer jobs - implementation agents have compaction protection
+- Three inviolable rules: no new ideas, no data loss, no semantic diffusion
+- Structural context allowed (references between jobs, scope boundaries)
 
-This is where our new functionality comes in. At this point we need to map the spec into phase-spec documents.
+### Step 2: Implementation Planning Per Job
 
-**Sizing judgment:** First the agent makes a judgment: is this trivial enough for one agent to handle in one go? Use criteria/validation rules/guidelines for this decision. If yes → create one phase-spec. If no → split into multiple.
+Sequential agent loops, one per job.
 
-We need an agent that will do this. Each phase-spec needs to be a vertical slice of the spec, a self contained unit of work with as little dependency on other phases as possible.
+Agents:
+- `wfs-impl-worker` - Creates implementation plans via deep codebase research
+- `wfs-impl-checker` - Audits plans against job requirements
 
-**Examples:**
-- If there are data models to make they can be made first
-- If there is a new service to be made that can be made in isolation without affecting anything else, make that first
+Each `wfs-impl-worker` invocation receives:
+- **Full job-spec document** - sees all jobs, understands the whole picture
+- **Implementation directory** - access to all previous implementation plans
+- **Target job identifier** - knows which job to plan
 
-Everything needs to be checked for its dependencies in implementation and those dependencies will dictate what goes in what phase.
-
-**Output:** `plans/[feature-slug]/phase-specs/[feature-slug]-[phase-slug]-spec.md`
-
-If there were 9 phases then the folder will have 9 documents. No data should be lost in this process and no ideas should be added in this process. We strictly want a reorganisation of the spec into workable phases.
-
-### Job Breakdown
-
-Now we need another agent that organises the phases into jobs. Jobs are a logical group of tasks that need to be completed for a smaller goal.
-
-This is just organising work - first we broke it down into phases and now each phase needs to be broken down into jobs.
-
-**Job sizing rules:**
-- Jobs should be sized by rules and criteria
-- Can have as many jobs as needed in a phase but bias against many small jobs
-- For small work this naturally results in 1 phase with 1-2 jobs
-
-No data should be lost in this process and no ideas should be added in this process. We strictly want a reorganisation of the spec into workable jobs.
-
-**Output:** `plans/[feature-slug]/phase-job-specs/[feature-slug]-[phase-slug]-job-spec.md`
-
-### Implementation Planning
-
-Now each phase-job-spec needs to be processed into a detailed implementation plan that has its own document.
+This full-context approach means:
+- Planners understand dependencies naturally
+- Planners can reference previous plans
+- No information is lost between jobs
 
 Uses the standard feedback loop pattern:
-- Deep-drill → Slag-check (auto-retry, then human-in-loop) *(example - will be rewritten)*
+- `wfs-impl-worker` → `wfs-impl-checker` (auto-retry, then human-in-loop)
 
-**Deep-drill** *(example - will be rewritten)*
-- Given a document path as argument
-- If document is empty → start from scratch
-- If document has feedback at bottom → another agent failed, use the feedback to do it properly
-- Output needs to be job with tasks matching wf-job.md format
+Worker detects retry by presence of `## Previous Implementation Feedback` section in the plan file. Checker audits for: SPEC_MISMATCH, TECHNICAL, INCOMPLETE, PATTERN_ERROR, SCOPE_CREEP.
 
-**Slag-check** *(example - will be rewritten)*
-- Audits the plan
-- Writes feedback directly into the document (not back to orchestrator)
-- Returns pass/fail signal to orchestrator
-
-**Output:** `plans/[feature-slug]/phase-implementation/[phase-slug]/[job-slug].md`
-
-The deliverable here is going to be a folder with folders in it, each folder will have a file for each job of the phase.
-
-At this point we now have a folder with a folder for each phase, in each folder is files, each file contains an implementation plan for a job.
+**Output:** `plans/[feature-slug]/implementation/[job-slug].md`
 
 ---
 
@@ -139,22 +110,58 @@ At this point we now have a folder with a folder for each phase, in each folder 
 
 **Deliverable:** Completed implementation with audit reports/amendments appended to each job file.
 
-Now we need to do implementation for each phase which is an orchestrator - it should launch an agent to do a job file.
+Sequential agent loops, one per job.
 
-Uses the standard feedback loop pattern:
-- Implementation Agent → Audit Agent (auto-retry, then human-in-loop) *(example - will be rewritten)*
+### Implementation Agent
 
-### Implementation Agent *(example - will be rewritten)*
-
-- Reads the job file
+- Reads the implementation plan file
 - If no amendments section → do the work from scratch
-- If amendments section exists → another agent already attempted, use the amendments as guidance to finish properly
-- Executes the tasks in the job
+- If amendments section exists → previous attempt failed, use amendments as guidance
+- Executes the tasks in the plan
 
-### Audit Agent *(example - will be rewritten)*
+### Audit Agent
 
-- Audits the completed work against the job spec
-- Writes amendments/audit report directly into the job file
+- Audits the completed work against the implementation plan
+- Writes amendments/audit report directly into the plan file
 - Returns pass/fail signal to orchestrator
 
+Uses the standard feedback loop pattern:
+- Implementation Agent → Audit Agent (auto-retry, then human-in-loop)
+
 ---
+
+## File Structure
+
+```
+plans/[feature-slug]/
+├── [feature-slug]-spec.md              # Detailed spec (from spec-planner)
+├── [feature-slug]-job-spec.md          # Jobs document (from job-spec-creator)
+└── implementation/
+    ├── [job-1-slug].md                 # Implementation plan for job 1
+    ├── [job-2-slug].md                 # Implementation plan for job 2
+    └── ...
+```
+
+---
+
+## Key Design Decisions
+
+### No Phases, Just Jobs
+
+Original design had specs → phases → jobs. Simplified to specs → jobs.
+
+Phases added complexity without benefit. Jobs organized by dependency chain achieve the same goal with less overhead.
+
+### Implementation Agents Have Compaction Protection
+
+Don't worry about job size. Agents can work through large jobs without losing track. Over-fragmentation (too many small jobs) is worse than slightly-too-large jobs.
+
+Bias toward fewer jobs. Only split when dependencies require it.
+
+### Full Context for Implementation Planning
+
+Each implementation planner sees:
+- The entire job-spec (all jobs, not just theirs)
+- All previous implementation plans
+
+This prevents information loss and lets planners make informed decisions about their work.
