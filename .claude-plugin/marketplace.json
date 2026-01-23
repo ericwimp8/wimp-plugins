@@ -57,7 +57,7 @@
     },
     {
       "name": "workflow-system",
-      "version": "0.1.0",
+      "version": "0.5.0",
       "source": "./workflow-system",
       "description": "Composable workflow orchestration for planning and implementing software tasks at varying scales"
     }

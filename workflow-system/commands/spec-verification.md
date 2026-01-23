@@ -17,6 +17,25 @@ Document: absolute path to spec file
 
 ---
 
+## Important Processing Rules
+
+- **There is no token budget.** Automatic summarization provides unlimited context. You MUST follow the sequential ordering outlined in these instructions. NEVER try to optimize for efficiency by running tasks in parallel.
+- **Running tasks in parallel will not save tokens or context.** It will break the implementation and the work will be ruined. Parallel execution provides zero benefit and causes catastrophic failure.
+- **NEVER override explicit instructions with your own judgment about efficiency.** The sequential process exists for critical reasons. Your ideas about "optimization" are wrong.
+- **ALWAYS follow the instructions exactly as written.** Do not deviate. Do not improvise. Do not batch. Do not consolidate. One phase at a time. One stage at a time.
+- **If you feel tempted to "speed things up"** - this feeling is a bug, not a feature. The sequential process IS the fast path. Deviating will destroy all progress.
+
+> ⚠️ **WARNING SIGNS YOU ARE ABOUT TO FAIL:**
+> - You feel the remaining work is "a lot" or "tedious"
+> - You want to "batch" or "combine" phases
+> - You're thinking about "efficiency" or "optimization"
+> - You want to consolidate your todo list
+> - You're inventing constraints like "token budget" or "context limits"
+>
+> If you notice these thoughts, STOP. They are the precursor to failure. Return to the sequential process.
+
+---
+
 ## Checkpoint
 
 ### Why
