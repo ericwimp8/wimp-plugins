@@ -9,12 +9,12 @@ You are orchestrating a workflow to fix failing tests for: `$1`
 
 ## Skills
 
-These skills contain curated patterns that agents MUST invoke and read. Pass them to agents in Phase 2.
+These skills contain curated patterns that agents MUST invoke and read. Pass them to agents in Phase 5.
 
 - `dart-testing` - **Always pass** for Dart testing patterns
 - `riverpod-testing` - **Pass if** source file imports `riverpod`, `flutter_riverpod`, or `hooks_riverpod`
 
-Before Phase 1, check the source file imports to determine which skills apply.
+Before starting, check the source file imports to determine which skills apply.
 
 **Format:** `Skills: dart-testing` (add `riverpod-testing` if source uses Riverpod)
 
@@ -25,44 +25,73 @@ Before Phase 1, check the source file imports to determine which skills apply.
 ## Derived Paths
 
 From source file `$1`, compute:
-- **Plan file**: `test/plans/[filename]_fix_plan.md` (filename without extension)
+- **Plan file**: `test/plans/[filename]_plan.md` (filename without extension)
+- **Fix plan file**: `test/plans/[filename]_fix_plan.md` (filename without extension)
 - **Test file**: Mirror path under `test/`, append `_test` before extension
 
 Example:
 - Source: `lib/src/features/auth/user_service.dart`
-- Plan: `test/plans/user_service_fix_plan.md`
+- Plan: `test/plans/user_service_plan.md`
+- Fix plan: `test/plans/user_service_fix_plan.md`
 - Test: `test/src/features/auth/user_service_test.dart`
 
 ## Workflow
 
 Execute these phases in order using the Task tool to invoke each agent.
 
-### Phase 1: Discover Failing Tests
+### Phase 1: Plan Test Cases
 
-Invoke the `test-writer-dart:tw-discover-failing-tests` agent using the prompt template below.
-- **Expected output**: Plan file at `test/plans/[source_file_name]_fix_plan.md` OR `Result: ALL_PASSING`
+Invoke the `test-writer-dart:tw-plan-cases` agent to analyze the source and create an ideal test plan.
 
-**If result is ALL_PASSING:** Report "All tests passing" and exit.
-
-**MANDATORY**: NEVER add any instructions or extra details of any kind to the prompt. Use the template below exactly, replacing placeholders in brackets.
-
-**Prompt template** (use this format exactly):
+**Prompt template:**
 ```
-Discover failing tests in: {test_file_path}
-Source: {source_file_path}
-Plan: {plan_file_path}
+Create a test plan for source file: {source_file_path}
 ```
-
-Where:
-- `{test_file_path}` - full path to test file
-- `{source_file_path}` - full path to source file
-- `{plan_file_path}` - full path to fix plan file
 
 Wait for completion before proceeding.
 
-### Phase 2: Fix Loop
+### Phase 2: Check Redundancy
 
-Read the plan file and find all cases with status `pending` or `in_progress`.
+Invoke the `test-writer-dart:tw-check-redundancy` agent to eliminate redundant cases from the plan.
+
+**Prompt template:**
+```
+Check for redundant test cases in plan: {plan_file_path}
+```
+
+Wait for completion before proceeding.
+
+### Phase 3: Audit Tests
+
+Invoke the `test-writer-dart:tw-audit` agent to reconcile the test file with the plan and audit test quality.
+
+**Prompt template:**
+```
+Audit test file: {test_file_path}
+Plan: {plan_file_path}
+```
+
+Wait for completion before proceeding.
+
+### Phase 4: Discover Failing Tests
+
+Invoke the `test-writer-dart:tw-discover-failing-tests` agent using the prompt template below.
+- **Expected output**: Fix plan file at `test/plans/[source_file_name]_fix_plan.md` OR `Result: ALL_PASSING`
+
+**If result is ALL_PASSING:** Report "All tests passing" and exit.
+
+**Prompt template:**
+```
+Discover failing tests in: {test_file_path}
+Source: {source_file_path}
+Plan: {fix_plan_file_path}
+```
+
+Wait for completion before proceeding.
+
+### Phase 5: Fix Loop
+
+Read the fix plan file and find all cases with status `pending` or `in_progress`.
 
 Process each incomplete case **one at a time**, in plan order.
 
@@ -76,13 +105,11 @@ Invoke the `test-writer-dart:tw-run-fix` agent using the prompt template below.
 - NEEDS_CLARIFICATION → log and continue to next case
 - STUCK → extract failure details from the report and retry with them as "Previous failure" (up to 2 retries), then continue if still stuck
 
-**MANDATORY**: NEVER add any instructions or extra details of any kind to the prompt. Use the template below exactly, replacing placeholders in brackets.
-
-**Prompt template** (use this format exactly):
+**Prompt template:**
 ```
 Run and fix test file: {test_file_path}
 Implementation: {source_file_path}
-Plan: {plan_file_path}
+Plan: {fix_plan_file_path}
 Case: {case_id}
 Max iterations: 9
 Attempt: 1
@@ -93,7 +120,7 @@ Skills: dart-testing{riverpod_suffix}
 ```
 Run and fix test file: {test_file_path}
 Implementation: {source_file_path}
-Plan: {plan_file_path}
+Plan: {fix_plan_file_path}
 Case: {case_id}
 Max iterations: 9
 Attempt: {attempt_number}
@@ -106,7 +133,7 @@ Previous failure:
 Where:
 - `{test_file_path}` - full path to test file
 - `{source_file_path}` - full path to source file being tested
-- `{plan_file_path}` - full path to fix plan file
+- `{fix_plan_file_path}` - full path to fix plan file
 - `{case_id}` - case identifier from plan (e.g., `Case 1`)
 - `{attempt_number}` - retry attempt number (2 for first retry, 3 for second retry)
 - `{riverpod_suffix}` - add `, riverpod-testing` if source uses Riverpod, otherwise omit
@@ -114,7 +141,7 @@ Where:
 
 Repeat for each incomplete case.
 
-### Phase 3: Write Report
+### Phase 6: Write Report
 
 After all cases are processed, write a report file.
 
@@ -138,9 +165,13 @@ Generated: [human-readable timestamp]
 - **Cases fixed**: [n]
 - **Cases stuck**: [n]
 
+## Audit Summary
+
+[Include summary from Phase 3 audit: tests removed, stubbed, added, kept]
+
 ## Iteration Statistics
 
-[Read the **Attempts** field from each case in the plan file]
+[Read the **Attempts** field from each case in the fix plan file]
 
 | Case | Attempts | Total Iterations | Final Status |
 |------|----------|------------------|--------------|

@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "test-writer-dart",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "source": "./",
       "description": "Test generation for Dart and Flutter with mocktail and Riverpod patterns",
       "commands": ["./test-writer-dart/commands", "./shared/commands"],
@@ -20,7 +20,8 @@
         "./shared/agents/tw-check-redundancy.md",
         "./shared/agents/tw-run-fix.md",
         "./shared/agents/tw-check-testability.md",
-        "./shared/agents/tw-discover-failing-tests.md"
+        "./shared/agents/tw-discover-failing-tests.md",
+        "./shared/agents/tw-audit.md"
       ],
       "skills": ["./test-writer-dart/skills"]
     },
@@ -36,7 +37,8 @@
         "./shared/agents/tw-check-redundancy.md",
         "./shared/agents/tw-run-fix.md",
         "./shared/agents/tw-check-testability.md",
-        "./shared/agents/tw-discover-failing-tests.md"
+        "./shared/agents/tw-discover-failing-tests.md",
+        "./shared/agents/tw-audit.md"
       ],
       "skills": ["./test-writer-typescript/skills"]
     },
