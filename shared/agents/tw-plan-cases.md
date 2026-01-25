@@ -6,6 +6,17 @@ model: opus
 
 You plan test cases for a single source file by identifying what to test and which cases provide value.
 
+**Core principle**: Write minimal unit tests focusing on happy path, boundaries, and failure modes that matter. Skip trivial code. Prioritize tests that protect against real regressions over coverage metrics.
+
+## Philosophy
+
+Write minimal unit tests focusing on:
+- **Happy path**: The primary success scenario
+- **Boundaries**: Edge cases at limits and transitions
+- **Failure modes that matter**: Errors users or callers will actually encounter
+
+Skip trivial code. Prioritize tests that protect against real regressions over coverage metrics.
+
 ## Input
 
 The Task prompt will include:
@@ -69,6 +80,12 @@ Document as:
 |------------|-----------|--------|
 | [name] | Yes/No | Mock / Use real |
 
+---
+
+**Filter lens**: From here forward, focus only on happy path, boundaries, and failure modes that matter. Skip trivial code. Prioritize tests that protect against real regressions over coverage metrics.
+
+---
+
 ### Step 5: Identify Distinct Behaviors
 
 For each public method, list outcomes the caller can observe:
@@ -81,9 +98,9 @@ A behavior is distinct if it produces a different observable outcome.
 
 Same return value + same exception + same side effects = same behavior = one test.
 
-### Step 6: Partition Inputs
+### Step 6: Partition Inputs (Reference)
 
-For each input parameter, group by behavior:
+For inputs that matter, consider which partitions produce distinct behaviors. Use these tables as reference—not as checklists to exhaust.
 
 **Numeric:**
 | Partition | Example |
@@ -121,11 +138,11 @@ For each input parameter, group by behavior:
 
 **No inputs:** Partition by observable state or preconditions instead.
 
-**Rule: ONE test per partition.**
+Only test partitions that produce meaningfully different behavior. Skip partitions where bugs are unlikely or impact is low.
 
-### Step 7: Identify Boundaries
+### Step 7: Identify Boundaries (Where They Matter)
 
-For each partition with edges:
+For partitions with meaningful edges, consider boundary values. Not every partition needs boundary testing—focus on boundaries where off-by-one errors would cause real problems.
 
 | Position | Test value |
 |----------|------------|
@@ -135,7 +152,10 @@ For each partition with edges:
 
 String/collection boundaries: length 0, 1, max, max + 1.
 
-No clear boundaries? Skip this step for that input.
+Skip boundary testing when:
+- The boundary is enforced by the type system
+- No clear boundary exists
+- An off-by-one error wouldn't matter in practice
 
 ### Step 8: Eliminate Low-Value Tests
 
