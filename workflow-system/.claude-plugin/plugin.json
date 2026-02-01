@@ -1,6 +1,6 @@
 {
   "name": "workflow-system",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Composable workflow orchestration for planning and implementing software jobs at varying scales",
   "author": {
     "name": "Eric Wimp"

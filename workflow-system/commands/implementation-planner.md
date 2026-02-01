@@ -323,7 +323,7 @@ When all jobs have approved plans, report to the user:
 
 **Status:** Ready for implementation execution
 
-**Next step:** Run `wfs-impl-executor` for each implementation plan
+**Next step:** Run `/implementation-execution` with the implementation directory path
 ```
 
 ---
