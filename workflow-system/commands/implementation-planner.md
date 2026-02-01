@@ -24,7 +24,6 @@ Spec: absolute path to spec file
 - **NEVER override explicit instructions with your own judgment about efficiency.** The sequential process exists for critical reasons. Your ideas about "optimization" are wrong.
 - **ALWAYS follow the instructions exactly as written.** Do not deviate. Do not improvise. Do not batch. Do not consolidate. One job at a time. One loop at a time.
 - **If you feel tempted to "speed things up"** - this feeling is a bug, not a feature. The sequential process IS the fast path. Deviating will destroy all progress.
-- **Only run tasks in parallel when EXPLICITLY instructed to.** This document explicitly instructs task-generator to run in background. That is the ONLY exception. Do not invent other exceptions.
 
 > ⚠️ **WARNING SIGNS YOU ARE ABOUT TO FAIL:**
 > - You feel the remaining work is "a lot" or "tedious"
@@ -47,7 +46,7 @@ This command runs multi-step loops across multiple jobs. Compaction can happen a
 
 **MANDATORY**: Create a progress task immediately with subject starting: `Tracking /implementation-planner`
 
-Include: spec path, job-spec path (once created), current job number, current phase (auto-retry or human-in-loop), iteration counts, task-generator output files for each completed job. Update at every significant step. Mark complete when finished.
+Include: spec path, job-spec path (once created), current job number, current phase (auto-retry or human-in-loop), iteration counts. Update at every significant step. Mark complete when finished.
 
 ---
 
@@ -62,12 +61,10 @@ For each job:
 3. Run `wfs-impl-checker` to audit
 4. Auto-retry up to 3 times on ISSUES
 5. Human-in-loop if issues persist (amend feedback, retry until PASS or user says "proceed")
-6. Run `wfs-task-generator` in background to create build plan with atomic tasks
-7. Move to next job immediately (don't wait for task-generator)
+6. Proceed to next job
 
 **Step 3 - Completion:**
-8. Verify all task-generators completed
-9. Report final status with build plan paths
+7. Report final status with implementation plan paths
 
 ---
 
@@ -142,16 +139,14 @@ Tell user: "Planning Job N: [name]..."
         ↓
 Run Auto-retry Loop (up to 3 times)
         ↓
-If PASS: start task-generator in background, proceed to next job
+If PASS: **update checkpoint** (job N complete), proceed to next job
 If still ISSUES after 3 retries: enter Human-in-loop
         ↓
 Human-in-loop until PASS or user says "proceed"
         ↓
-Start task-generator in background
+**Update checkpoint** (job N complete)
         ↓
-**Update checkpoint** (job N complete, task-generator output file)
-        ↓
-Proceed to next job (or verification if last job)
+Proceed to next job (or completion if last job)
 ```
 
 ---
@@ -214,12 +209,11 @@ The implementation plan path is returned by the worker.
 ### Handling Checker Output
 
 **PASS**: Job planning complete.
-1. Start task-generator in background (see ## Task Generator)
-2. Report to user:
+1. Report to user:
 ```
-"Job N: [name] - Plan approved ✓ (generating build plan in background)"
+"Job N: [name] - Plan approved ✓"
 ```
-3. Proceed to next job immediately
+2. Proceed to next job
 
 **ISSUES**: Checker has written feedback to `## Previous Implementation Feedback` section in the plan. Worker will read this on next invocation.
 
@@ -302,75 +296,34 @@ Rewrite the `## Previous Implementation Feedback` section with the amendments ap
 ### User Override (Proceed)
 
 If user says "proceed" (or equivalent), exit the human-in-loop and accept the plan despite issues:
-1. Start task-generator in background (see ## Task Generator)
-2. Report to user:
+1. Report to user:
 ```
-"Job N: [name] - Plan accepted with warnings (generating build plan in background)
+"Job N: [name] - Plan accepted with warnings
 
 Note: Checker identified issues that remain unresolved. Proceeding per user request."
 ```
 
 ---
 
-## Task Generator
-
-After a job's implementation plan is approved (PASS) or accepted (user says "proceed"), run task-generator **in the background**. Move to the next job immediately.
-
-### Invoking Task-Generator
-
-Invoke the `workflow-system:wfs-task-generator` agent in the background.
-
-**MANDATORY**: Use the contract below exactly.
-
-## Output
-```
-Implementation plan: absolute path to implementation plan
-```
-
-Store the output_file path in the checkpoint for verification at completion.
-
----
-
 ## Completion
-
-### Step 1: Verify All Task-Generators Completed
-
-Before reporting completion, verify all background task-generators have finished:
-
-```
-For each job:
-        ↓
-Read the task-generator output file from checkpoint
-        ↓
-If COMPLETE: record build plan path
-If FAILED: report error to user, ask how to proceed
-If still running: wait (use TaskOutput with block: true)
-```
-
-### Step 2: Report Completion
 
 **Mark checkpoint complete.**
 
-When all jobs have approved plans and all task-generators have completed, report to the user:
+When all jobs have approved plans, report to the user:
 ```
 ## Implementation Planning Complete
 
 **Spec:** [full path to spec]
 **Job-spec:** [full path to job-spec]
 
-**Jobs Planned:**
-- Job 1: [name] - ✓ approved ([N] tasks)
-- Job 2: [name] - ✓ approved with warnings ([N] tasks)
-- ...
-
-**Build Plans:**
-- [path to job-1 build plan]
-- [path to job-2 build plan]
+**Implementation Plans:**
+- Job 1: [name] - ✓ approved - [path to plan]
+- Job 2: [name] - ✓ approved with warnings - [path to plan]
 - ...
 
 **Status:** Ready for implementation execution
 
-**Next step:** Run implementation-execution to execute the build plans
+**Next step:** Run `wfs-impl-executor` for each implementation plan
 ```
 
 ---
@@ -384,8 +337,5 @@ plans/[feature-slug]/
 └── implementation/
     ├── job-1-[slug].md                 # Implementation plan for job 1
     ├── job-2-[slug].md                 # Implementation plan for job 2
-    └── build-plans/
-        ├── job-1-[slug]-build-plan.md  # Build plan with atomic tasks
-        ├── job-2-[slug]-build-plan.md  # Build plan with atomic tasks
-        └── ...
+    └── ...
 ```

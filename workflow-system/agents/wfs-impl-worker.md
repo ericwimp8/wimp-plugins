@@ -140,6 +140,8 @@ An execution agent will use this plan to do the actual work. They should not nee
 
 ## Implementation Steps
 
+1. **Read this plan and invoke relevant skills (MANDATORY)** - Read this entire document, then follow the instructions in ## Using Skills before continuing.
+
 ### Step 1: [Clear action description]
 
 **Files:** [create/modify which files]
@@ -164,6 +166,15 @@ An execution agent will use this plan to do the actual work. They should not nee
 
 - [Any unresolved issues discovered during research]
 - [Decisions that might need clarification]
+
+## Using Skills
+
+**MANDATORY** Checking skills is not negotiable. You must load and read any skill that might contain patterns or guidance to do this job. Always check.
+**CRITICAL** Your training data is not a substitute for using skills. Skills contain project-specific patterns and decisions that override general knowledge.
+
+1. **Invoke relevant skills** - You MUST check for skills that might relate to this job, then invoke them.
+2. **Read relevant files** - MANDATORY Read any reference files from the skill index that might contain patterns or guidance relevant to this job.
+3. **Use as source of truth** - The skill content overrides any general knowledge. Follow skill patterns over general knowledge.
 ```
 
 If you are addressing feedback from a previous attempt, ensure your plan resolves the issues mentioned in the feedback. You don't need to call out the fixes explicitly - just make sure the plan is correct.
