@@ -2,7 +2,7 @@
 
 A comprehensive Claude Code plugin for creating and managing high-quality Agent Skills. This plugin provides a complete toolset for transforming codebase analysis and documentation into reusable Claude Code skills.
 
-**Version:** 1.4.0
+**Version:** 1.5.0
 **Author:** Eric Wimp
 **License:** MIT
 
@@ -101,8 +101,8 @@ The command will guide you through selecting how many concepts to scan (4, 8, 12
 
 **Output:**
 - Skill directory at `.claude/skills/[skill-name]/`
-- `reference.md` - full source document
-- `SKILL.md` - skill manifest with TOC and usage instructions
+- `SKILL.md` - skill manifest with file index and usage instructions
+- `references/` - directory containing split content files
 
 **Example:**
 
@@ -110,7 +110,7 @@ The command will guide you through selecting how many concepts to scan (4, 8, 12
 claude doc-to-skill docs/flutter-testing.md
 ```
 
-This will create a skill in `.claude/skills/flutter-testing/` with progressive disclosure enabled.
+This will create a skill in `.claude/skills/flutter-testing/` with content files in the `references/` subdirectory.
 
 ---
 
@@ -127,8 +127,8 @@ This will create a skill in `.claude/skills/flutter-testing/` with progressive d
 
 **Output:**
 - Skill directory at `.claude/skills/[skill-name]/`
-- All markdown files copied to skill directory
 - `SKILL.md` - skill manifest with file index and descriptions
+- `references/` - directory containing all content files
 
 **Example:**
 
@@ -252,23 +252,22 @@ Agents are specialized Claude Code agents that execute specific tasks. They are 
 
 **Responsibilities:**
 - Reads single markdown reference files
-- Extracts metadata and table of contents
-- Generates SKILL.md with proper manifest and usage instructions
-- Sets up progressive disclosure pattern with grep instructions
+- Splits content into focused files in `references/` directory
+- Generates SKILL.md with file index and usage instructions
+- Sets up progressive disclosure pattern with file-based navigation
 
 **Inputs:**
 - Source markdown file path (via `$ARGUMENTS`)
 
 **Output:**
 - Skill directory structure at `.claude/skills/[skill-name]/`
-- `reference.md` - original source file
-- `SKILL.md` - skill manifest with metadata and TOC
+- `SKILL.md` - skill manifest with file index and usage instructions
+- `references/` - directory containing split content files
 
 **Skill Features:**
-- Progressive disclosure enabled for large reference files
-- TOC-based navigation instructions
-- Grep examples for accessing specific sections
-- Optimized for LLM consumption
+- Content split into logical files in `references/` directory
+- File index with markdown links for navigation
+- Optimized for LLM consumption with progressive disclosure
 
 ## Available Skills
 
@@ -284,25 +283,27 @@ Skills provide specialized guidance and tooling. They can be invoked directly or
 - Ignore pattern support for build artifacts and dependencies
 - Framework-aware pattern suggestions (Flutter, Node.js, Python)
 
-**Script Location:** `skills/file-tree/scripts/tree.sh`
+**Script Location:** [tree.sh](scripts/tree.sh)
 
 **Usage:**
 
+Run the script from the skill directory (paths are relative to skill root):
+
 ```bash
-bash skills/file-tree/scripts/tree.sh /path/to/project
+bash scripts/tree.sh /path/to/project
 ```
 
 **With Ignore Patterns:**
 
 ```bash
 # Flutter/Dart project
-bash skills/file-tree/scripts/tree.sh /project --ignore ".git,.dart_tool,build,.packages,ios/Pods,android/.gradle"
+bash scripts/tree.sh /project --ignore ".git,.dart_tool,build,.packages,Pods,.gradle"
 
 # Node.js project
-bash skills/file-tree/scripts/tree.sh /project --ignore ".git,node_modules,dist,.cache,.next"
+bash scripts/tree.sh /project --ignore ".git,node_modules,dist,.cache,.next"
 
 # Python project
-bash skills/file-tree/scripts/tree.sh /project --ignore ".git,__pycache__,.venv,.pytest_cache,*.egg-info"
+bash scripts/tree.sh /project --ignore ".git,__pycache__,.venv,.pytest_cache,*.egg-info"
 ```
 
 **Output Format:**
@@ -329,21 +330,19 @@ project/package.json
 **Processing:**
 1. Reads all markdown files in source directory
 2. Determines appropriate skill name
-3. Creates `.claude/skills/[skill-name]/` directory
-4. Copies all markdown files
-5. Generates SKILL.md with file index and descriptions
+3. Creates `.claude/skills/[skill-name]/` directory with `references/` subdirectory
+4. Places all content files in `references/`
+5. Generates SKILL.md with file index linking to `references/` files
 
 **Constraints:**
-- Maximum 6 markdown files per skill
-- Each file must be under 400 lines
-- Files should not reference each other
+- Maximum 6 content files inside `references/`, each under 400 lines
+- Content files should not reference each other
 - Skill name: lowercase letters, numbers, hyphens (max 64 chars)
 
 **Skill Manifest (SKILL.md) Structure:**
 - Metadata: `name` and `description`
-- Overview: 1-2 sentence summary
-- File Index: Table with file names and descriptions
-- Usage: Instructions for accessing information
+- File Index: Links to content files using `[Title](references/filename.md)` syntax
+- Usage: Instructions for reading relevant files
 
 ---
 
@@ -354,17 +353,16 @@ project/package.json
 
 **Provides:**
 - Extracts skill metadata from document headings
-- Preserves table of contents structure
-- Enables progressive disclosure with grep instructions
+- Splits content into focused files in `references/`
+- Enables progressive disclosure with file-based navigation
 - Creates reference-based skills for efficient access
 
 **Processing:**
 1. Reads single markdown reference file
 2. Extracts skill name from level-1 heading (converts to kebab-case)
-3. Creates `.claude/skills/[skill-name]/` directory
-4. Extracts and preserves Table of Contents
-5. Copies full document to `reference.md`
-6. Generates SKILL.md with TOC and grep usage examples
+3. Creates `.claude/skills/[skill-name]/` directory with `references/` subdirectory
+4. Splits content at `---` separators into logical files inside `references/`
+5. Generates SKILL.md with file index linking to `references/` files
 
 **Source File Requirements:**
 - Level-1 heading (`# Title`) for skill metadata
@@ -373,14 +371,14 @@ project/package.json
 
 **Skill Manifest (SKILL.md) Structure:**
 - Metadata: `name` and `description`
-- Overview: 1-2 sentence summary
-- Table of Contents: Copied from source
-- Usage: Progressive disclosure instructions with grep examples
+- File Index: Links to content files using `[Title](references/filename.md)` syntax
+- Usage: Instructions for reading relevant files
 
 **Progressive Disclosure:**
-```bash
-# Example grep command generated in SKILL.md
-grep -A 100 "^## Section Name" reference.md | sed '/^---$/q'
+
+Content is split into focused files in `references/`. The SKILL.md file index uses markdown links:
+```markdown
+- [Section Title](references/section-name.md) — What it covers / When to use it
 ```
 
 This allows LLMs to read only relevant sections without loading entire files.
@@ -476,8 +474,9 @@ Skills provide reusable guidance and utilities:
     │                                │
     │                                │
     │ Each creates:                  │
-    │ .claude/skills/                │
-    │ [concept-name]/SKILL.md        │
+    │ .claude/skills/[concept-name]/ │
+    │ ├── SKILL.md                   │
+    │ └── references/*.md            │
     └────────────┬───────────────────┘
                  │
                  ▼

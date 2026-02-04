@@ -31,7 +31,7 @@ Examine root directory:
 ### 2. Structure Survey
 Use the `file-tree` skill to get a complete directory listing:
 ```bash
-bash skills/file-tree/scripts/tree.sh <target_dir> --ignore "<appropriate patterns>"
+bash scripts/tree.sh <target_dir> --ignore "<appropriate patterns>"
 ```
 
 Choose ignore patterns based on project type detected in step 1:

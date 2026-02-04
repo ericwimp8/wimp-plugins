@@ -9,12 +9,14 @@ Generates a flat list of all file and directory paths in a directory.
 
 ## Script Location
 
-`skills/file-tree/scripts/tree.sh`
+[tree.sh](scripts/tree.sh)
 
 ## Usage
 
+Run the script from the skill directory (paths are relative to skill root):
+
 ```bash
-bash skills/file-tree/scripts/tree.sh <directory> [--ignore "pattern1,pattern2"] [--type "ext"]
+bash scripts/tree.sh <directory> [--ignore "pattern1,pattern2"] [--type "ext"]
 ```
 
 ### Options
@@ -55,23 +57,23 @@ Generated code and dependency directories can contain thousands of files. Always
 
 ```bash
 # Dart/Flutter project
-bash skills/file-tree/scripts/tree.sh /path/to/project \
+bash scripts/tree.sh /path/to/project \
   --ignore ".git,.dart_tool,build,.packages,Pods,.gradle,node_modules,.next"
 
 # Node.js project
-bash skills/file-tree/scripts/tree.sh /path/to/project \
+bash scripts/tree.sh /path/to/project \
   --ignore ".git,node_modules,dist,.cache,.next,.turbo"
 
 # Python project
-bash skills/file-tree/scripts/tree.sh /path/to/project \
+bash scripts/tree.sh /path/to/project \
   --ignore ".git,__pycache__,venv,.venv,.pytest_cache,.mypy_cache"
 
 # Only Dart files
-bash skills/file-tree/scripts/tree.sh /path/to/project \
+bash scripts/tree.sh /path/to/project \
   --ignore ".git,.dart_tool" --type dart
 
 # Only TypeScript files
-bash skills/file-tree/scripts/tree.sh /path/to/project \
+bash scripts/tree.sh /path/to/project \
   --ignore ".git,node_modules" --type ts
 ```
 

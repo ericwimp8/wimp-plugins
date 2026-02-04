@@ -118,8 +118,8 @@ Once the architecture document is complete, invoke the `skill-builder-agent` wit
 Where `[skill-location]` is `project`, `user`, `current`, or the custom path from Step 2.
 
 Wait for completion. The skill will be created at the chosen location with:
-- `SKILL.md` - skill manifest with TOC and usage instructions
-- Split content files organized by section
+- `SKILL.md` - skill manifest with file index and usage instructions
+- `references/` - directory containing split content files
 
 ## Step 5: Summary
 
@@ -133,7 +133,7 @@ Report what was created, using the actual skill location chosen by the user:
 
 ### Skill
 - `[skill-location]/[concept-name]/SKILL.md`
-- `[skill-location]/[concept-name]/*.md` (split content files)
+- `[skill-location]/[concept-name]/references/*.md` (split content files)
 
 The skill is now available for Claude to use when working with [concept-name].
 ```

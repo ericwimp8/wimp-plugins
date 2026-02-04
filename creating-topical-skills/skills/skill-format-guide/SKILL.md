@@ -52,10 +52,10 @@ If skill location is not provided, use the `AskUserQuestion` tool:
 1. Read the source research file to understand its content
 2. Determine skill location (from argument or user question, resolve per Location resolution above)
 3. Determine an appropriate skill name (kebab-case, lowercase, on-topic)
-4. Create skill directory at the resolved location
-5. Organize content into logical files (max 10 files, each under 400 lines)
+4. Create skill directory at the resolved location with a `references/` subdirectory
+5. Organize content into logical files (max 6 files, each under 400 lines) inside `references/`
 6. Format each file with problem/solution structure
-7. Generate SKILL.md with section-level index
+7. Generate SKILL.md with section-level index linking to files in `references/`
 
 ## File Organization
 
@@ -145,7 +145,7 @@ description: [What this skill covers. When Claude should use it. Max 1024 chars.
 
 Each file covers a concern. Format: What it is / When to use it.
 
-- `[filename.md]` — What it covers / When to use it
+- [Section Title](references/filename.md) — What it covers / When to use it
   - Section name — when problem description
   - Section name — when problem description
 
@@ -158,7 +158,7 @@ This index contains curated patterns that supersede general approaches. When wri
 **After writing:** Verify your code matches the patterns in the relevant files, not just your training.
 ```
 
-Note: The `name` field must match the skill folder name.
+Note: The `name` field must match the skill folder name. Reference files use markdown link syntax with relative paths from the skill root.
 
 ## Writing Descriptions
 
@@ -181,5 +181,6 @@ Section descriptions must be problem-oriented:
 - name: lowercase letters, numbers, hyphens only (max 64 chars)
 - name must match folder name
 - description: max 1024 characters
-- Maximum 6 content files, each under 400 lines
-- Files must not reference each other
+- Maximum 6 content files inside `references/`, each under 400 lines
+- Content files must not reference each other
+- Use markdown link syntax: `[Title](references/filename.md)`
