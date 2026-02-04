@@ -52,12 +52,6 @@
       "keywords": ["skills", "agent-skills", "tutorial", "documentation"]
     },
     {
-      "name": "token-furnace",
-      "version": "1.0.3",
-      "source": "./token-furnace",
-      "description": "Implementation workflow that burns tokens liberally for thorough planning and execution"
-    },
-    {
       "name": "workflow-system",
       "version": "0.7.0",
       "source": "./workflow-system",
