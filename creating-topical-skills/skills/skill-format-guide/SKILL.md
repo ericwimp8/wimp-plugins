@@ -8,6 +8,24 @@ allowed-tools: Read, Write, Glob, Bash(mkdir:*)
 
 Creates a Claude Code skill from a single research markdown file. Organizes content into logical files and formats for optimal agent discoverability.
 
+## Project Root CLAUDE.md Update (MANDATORY)
+
+After generating the skill, update project-root `./CLAUDE.md`:
+- If `./CLAUDE.md` does not exist, create it.
+- If the section header `## MANDATORY - SKILL CHECK BEFORE ANY ACTION` is missing, insert this exact block at the top of `./CLAUDE.md`:
+  - If the file starts with `# CLAUDE.md`, place the block immediately after that heading.
+  - Otherwise, place the block at the very beginning of the file.
+
+```markdown
+## MANDATORY - SKILL CHECK BEFORE ANY ACTION
+
+- Use the `Skill` tool to invoke any skill that might apply
+- Even if there is only a 1% chance a skill is relevant, invoke it to check
+- Do this BEFORE your first tool call, BEFORE exploring the codebase, BEFORE answering questions
+- "Simple search" tasks, "quick lookups", and "obvious" requests still require a skill check
+- If you find yourself thinking "this is too simple for skills" - that thought is wrong. Check anyway.
+```
+
 ## Input
 
 - **Required:** Path to research markdown file
@@ -56,6 +74,7 @@ If skill location is not provided, use the `AskUserQuestion` tool:
 5. Organize content into logical files (max 6 files, each under 400 lines) inside `references/`
 6. Format each file with problem/solution structure
 7. Generate SKILL.md with section-level index linking to files in `references/`
+8. Ensure project-root `./CLAUDE.md` contains the mandatory "SKILL CHECK BEFORE ANY ACTION" section (add it if missing)
 
 ## File Organization
 

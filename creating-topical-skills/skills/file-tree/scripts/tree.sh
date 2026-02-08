@@ -1,11 +1,12 @@
 #!/bin/bash
 
-# File tree script - outputs flat list of paths
-# Usage: ./tree.sh <directory> [--ignore "pattern1,pattern2"] [--type "ext"]
+# File tree script - writes flat list of paths to an output file
+# Usage: ./tree.sh <directory> <output-file> [--ignore "pattern1,pattern2"] [--type "ext"]
 
 set -e
 
 DIR=""
+OUTPUT_FILE=""
 IGNORE_PATTERNS=""
 FILE_TYPE=""
 
@@ -23,15 +24,22 @@ while [[ $# -gt 0 ]]; do
         *)
             if [[ -z "$DIR" ]]; then
                 DIR="$1"
+            elif [[ -z "$OUTPUT_FILE" ]]; then
+                OUTPUT_FILE="$1"
             fi
             shift
             ;;
     esac
 done
 
-# Validate directory
-if [[ -z "$DIR" ]]; then
-    echo "Usage: $0 <directory> [--ignore \"pattern1,pattern2\"] [--type \"ext\"]" >&2
+# Validate required arguments
+if [[ -z "$DIR" || -z "$OUTPUT_FILE" ]]; then
+    echo "Usage: $0 <directory> <output-file> [--ignore \"pattern1,pattern2\"] [--type \"ext\"]" >&2
+    exit 1
+fi
+
+if [[ ! -d "$DIR" ]]; then
+    echo "Error: '$DIR' is not a directory" >&2
     exit 1
 fi
 
@@ -40,33 +48,34 @@ if [[ -n "$FILE_TYPE" ]]; then
     FILE_TYPE="${FILE_TYPE#.}"
 fi
 
-if [[ ! -d "$DIR" ]]; then
-    echo "Error: '$DIR' is not a directory" >&2
-    exit 1
-fi
+# Build find arguments as an array (avoids eval and quoting issues)
+FIND_ARGS=("$DIR")
 
-# Build find command with ignore patterns and type filter
-if [[ -n "$FILE_TYPE" ]]; then
-    TYPE_EXPR="-type f -name \"*.$FILE_TYPE\""
-else
-    TYPE_EXPR="-type f -o -type d"
-fi
-
+# Add prune expressions for ignore patterns
 if [[ -n "$IGNORE_PATTERNS" ]]; then
-    # Convert comma-separated patterns to find -prune expressions
     IFS=',' read -ra PATTERNS <<< "$IGNORE_PATTERNS"
-    PRUNE_EXPR=""
+    FIND_ARGS+=("(")
+    first=true
     for pattern in "${PATTERNS[@]}"; do
         pattern=$(echo "$pattern" | xargs)  # trim whitespace
-        if [[ -n "$PRUNE_EXPR" ]]; then
-            PRUNE_EXPR="$PRUNE_EXPR -o"
+        if [[ -z "$pattern" ]]; then
+            continue
         fi
-        PRUNE_EXPR="$PRUNE_EXPR -name \"$pattern\""
+        if [[ "$first" != true ]]; then
+            FIND_ARGS+=("-o")
+        fi
+        FIND_ARGS+=("-name" "$pattern")
+        first=false
     done
-    FIND_CMD="find \"$DIR\" \\( $PRUNE_EXPR \\) -prune -o \\( $TYPE_EXPR \\) -print"
-else
-    FIND_CMD="find \"$DIR\" $TYPE_EXPR"
+    FIND_ARGS+=(")" "-prune" "-o")
 fi
 
-# Execute and sort output
-eval $FIND_CMD | sort
+# Add type filter
+if [[ -n "$FILE_TYPE" ]]; then
+    FIND_ARGS+=("-type" "f" "-name" "*.$FILE_TYPE" "-print")
+else
+    FIND_ARGS+=("(" "-type" "f" "-o" "-type" "d" ")" "-print")
+fi
+
+# Execute, sort, and write to output file
+find "${FIND_ARGS[@]}" | sort > "$OUTPUT_FILE"

@@ -1,12 +1,30 @@
 ---
 name: skill-format-guide-toc
 description: Create Claude Code skills from architecture documents with TOC format. Use when generating a skill from a markdown file with table of contents and sections separated by ---.
-allowed-tools: Read, Write, Glob, Bash(mkdir:*)
+allowed-tools: Read, Write, Glob, Bash(mkdir:*), AskUserQuestion
 ---
 
 # Skill Format Guide (TOC)
 
 Creates a Claude Code skill from a single markdown architecture document. Splits sections into logical files and formats for optimal agent discoverability.
+
+## Project Root CLAUDE.md Update (MANDATORY)
+
+After generating the skill, update project-root `./CLAUDE.md`:
+- If `./CLAUDE.md` does not exist, create it.
+- If the section header `## MANDATORY - SKILL CHECK BEFORE ANY ACTION` is missing, insert this exact block at the top of `./CLAUDE.md`:
+  - If the file starts with `# CLAUDE.md`, place the block immediately after that heading.
+  - Otherwise, place the block at the very beginning of the file.
+
+```markdown
+## MANDATORY - SKILL CHECK BEFORE ANY ACTION
+
+- Use the `Skill` tool to invoke any skill that might apply
+- Even if there is only a 1% chance a skill is relevant, invoke it to check
+- Do this BEFORE your first tool call, BEFORE exploring the codebase, BEFORE answering questions
+- "Simple search" tasks, "quick lookups", and "obvious" requests still require a skill check
+- If you find yourself thinking "this is too simple for skills" - that thought is wrong. Check anyway.
+```
 
 ## Input
 
@@ -51,11 +69,12 @@ If skill location is not provided, use the `AskUserQuestion` tool:
 
 1. Read the source markdown file
 2. Determine skill location (from argument or user question, resolve per Location resolution above)
-3. Extract skill name from the document heading (convert to kebab-case)
+3. Extract skill name from the document heading (convert to kebab-case, prefix with `topical-`, and enforce length constraints)
 4. Create skill directory at the resolved location with a `references/` subdirectory
-5. Split content at `---` separators into logical files (max 6 files, each under 400 lines) inside `references/`
+5. Split content at `---` separators into logical files (max 8 files, each under 400 lines) inside `references/`
 6. Format each file with problem/solution structure
 7. Generate SKILL.md with section-level index linking to files in `references/`
+8. Ensure project-root `./CLAUDE.md` contains the mandatory "SKILL CHECK BEFORE ANY ACTION" section (add it if missing)
 
 ## Source File Format
 
@@ -66,7 +85,7 @@ The source file must have:
 
 ## File Organization
 
-Each `---` separated section becomes a candidate for a separate file. Group related sections if needed to stay under 6 files. Each file should:
+Each `---` separated section becomes a candidate for a separate file. Group related sections if needed to stay under 8 files. Each file should:
 - Cover one coherent concept or component category
 - Be independently useful without requiring other files
 - Never reference other files
@@ -144,6 +163,14 @@ description: [What this skill covers. When Claude should use it. Max 1024 chars.
 
 # [Skill Title]
 
+## Usage
+
+This index contains curated patterns for the areas listed below. For tasks that match these areas, follow this index first and use general knowledge only to fill gaps. For tasks outside these areas, proceed normally.
+
+**Before writing:** Check the File Index. If the task matches an entry (feature area, component, API, or workflow), read the linked file before coding.
+**While writing:** If you are adding or changing non-trivial logic, introducing a new component/pattern, or behavior is unclear, stop and check for a matching pattern here.
+**After writing:** Verify changed code aligns with any relevant patterns you used from this index.
+
 ## File Index
 
 Each file covers a concern. Format: What it is / When to use it.
@@ -152,13 +179,7 @@ Each file covers a concern. Format: What it is / When to use it.
   - Section name — when problem description
   - Section name — when problem description
 
-## Usage
 
-This index contains curated patterns that supersede general approaches. When writing code for any problem listed above, read the matching file first—do not rely on general knowledge.
-
-**Before writing:** Scan this index. If your task matches an entry, read that file.
-**While writing:** If you're about to write non-trivial logic, pause and check if a pattern exists here.
-**After writing:** Verify your code matches the patterns in the relevant files, not just your training.
 ```
 
 Note: The `name` field must match the skill folder name. Reference files use markdown link syntax with relative paths from the skill root.
@@ -183,7 +204,9 @@ Section descriptions must be problem-oriented:
 
 - name: lowercase letters, numbers, hyphens only (max 64 chars)
 - name must match folder name
+- naming rule: build as `topical-` + kebab-case title; if longer than 64 chars, truncate the title portion so total length is 64 (keep the `topical-` prefix intact), then trim trailing hyphens
+- example naming: title `Building Reliable Event-Driven Payment Reconciliation Workflows for Multi-Region Systems` → kebab `building-reliable-event-driven-payment-reconciliation-workflows-for-multi-region-systems` → final `topical-building-reliable-event-driven-payment-reconciliation`
 - description: max 1024 characters
-- Maximum 6 content files inside `references/`, each under 400 lines
+- Maximum 8 content files inside `references/`, each under 400 lines
 - Content files must not reference each other
 - Use markdown link syntax: `[Title](references/filename.md)`

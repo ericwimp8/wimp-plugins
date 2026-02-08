@@ -16,13 +16,18 @@ Generates a flat list of all file and directory paths in a directory.
 Run the script from the skill directory (paths are relative to skill root):
 
 ```bash
-bash scripts/tree.sh <directory> [--ignore "pattern1,pattern2"] [--type "ext"]
+bash scripts/tree.sh <directory> <output-file> [--ignore "pattern1,pattern2"] [--type "ext"]
 ```
+
+### Arguments
+
+- `<directory>` - The directory to scan (required)
+- `<output-file>` - Path to write the file tree to (required)
 
 ### Options
 
 - `--ignore "pattern1,pattern2"` - Exclude directories/files by **name** (see below)
-- `--type "ext"` - Only show files with this extension (e.g., `ts`, `dart`, `.md`)
+- `--type "ext"` - Only include files with this extension (e.g., `ts`, `dart`, `.md`)
 
 ## How `--ignore` Works
 
@@ -39,9 +44,9 @@ The script uses `find -name "pattern"` which matches the basename (final compone
 
 **Common mistake:** Don't use paths like `ios/Pods` or `android/.gradle`. Use just the name: `Pods`, `.gradle`.
 
-## Output Format
+## Output
 
-One path per line, sorted alphabetically:
+Writes one path per line to the output file, sorted alphabetically. No terminal output.
 
 ```
 project/src/main.ts
@@ -57,23 +62,23 @@ Generated code and dependency directories can contain thousands of files. Always
 
 ```bash
 # Dart/Flutter project
-bash scripts/tree.sh /path/to/project \
+bash scripts/tree.sh /path/to/project /path/to/output.txt \
   --ignore ".git,.dart_tool,build,.packages,Pods,.gradle,node_modules,.next"
 
 # Node.js project
-bash scripts/tree.sh /path/to/project \
+bash scripts/tree.sh /path/to/project /path/to/output.txt \
   --ignore ".git,node_modules,dist,.cache,.next,.turbo"
 
 # Python project
-bash scripts/tree.sh /path/to/project \
+bash scripts/tree.sh /path/to/project /path/to/output.txt \
   --ignore ".git,__pycache__,venv,.venv,.pytest_cache,.mypy_cache"
 
 # Only Dart files
-bash scripts/tree.sh /path/to/project \
+bash scripts/tree.sh /path/to/project /path/to/output.txt \
   --ignore ".git,.dart_tool" --type dart
 
 # Only TypeScript files
-bash scripts/tree.sh /path/to/project \
+bash scripts/tree.sh /path/to/project /path/to/output.txt \
   --ignore ".git,node_modules" --type ts
 ```
 
