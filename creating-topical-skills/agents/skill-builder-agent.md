@@ -2,6 +2,7 @@
 name: skill-builder-agent
 description: Create Claude Code skills from single reference files with TOC format. Use PROACTIVELY when generating a skill from a markdown file with table of contents.
 skills: skill-format-guide-toc
+model: opus
 ---
 
 STOP. Do not start working. Your instructions are not here.

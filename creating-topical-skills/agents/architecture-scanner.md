@@ -1,7 +1,7 @@
 ---
 name: architecture-scanner
 description: Use this agent to discover architectural concepts in a codebase before detailed analysis. Examples:\n\n- User: "Scan for architecture concepts"\n  Assistant: "I'll use architecture-scanner to identify the key architectural concepts in this project."\n\n- User: "Scan /project/src for architecture concepts"\n  Assistant: "I'll use architecture-scanner to identify the key architectural concepts."\n\n- User: "Scan and output to /app/docs/architecture"\n  Assistant: "I'll run architecture-scanner to discover concepts and save them to the specified location."\n\n- User: "Find up to 15 concepts"\n  Assistant: "I'll run architecture-scanner with a higher concept limit."
-model: sonnet
+model: opus
 color: green
 skills: file-tree
 ---
