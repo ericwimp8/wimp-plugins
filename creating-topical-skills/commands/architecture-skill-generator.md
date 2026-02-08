@@ -140,17 +140,21 @@ For each chosen concept, invoke the `architecture-analyzer` agent with the conce
 
 Where `[docs-location]` is the resolved path from Step 1 (e.g., `project`, `user`, `current`, or the custom path).
 
+**CRITICAL: Do NOT run these agents in the background.** Parallel execution should use concurrent foreground tasks (not background threads/processes) so agents can still request user permissions when needed.
+
 **Concurrency: Run up to 3 analyzers in parallel.** Start 3, then maintain the queue—when one completes, start the next until all are done.
 
 Each analyzer outputs to the resolved docs location.
 
 ## Step 5: Generate Skills (Parallel)
 
-For each completed architecture document, invoke `skill-builder-agent` with the document path and resolved skill location:
+For each completed architecture document, invoke the `skill-builder-agent` with the document path and resolved skill location:
 
 "Use the skill-builder-agent to create a skill from [docs-path]/[concept-name].md [skill-location]"
 
 Where `[skill-location]` is `project`, `user`, `current`, or the custom path from Step 1.
+
+**CRITICAL: Do NOT run these agents in the background.** Parallel execution should use concurrent foreground tasks (not background threads/processes) so agents can still request user permissions when needed.
 
 **Concurrency: Run up to 3 skill generators in parallel.** Same queue behavior as Step 4.
 
