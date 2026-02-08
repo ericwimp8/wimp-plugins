@@ -26,6 +26,27 @@ After generating the skill, update project-root `./CLAUDE.md`:
 - If you find yourself thinking "this is too simple for skills" - that thought is wrong. Check anyway.
 ```
 
+## Project Root AGENTS.md Update (MANDATORY)
+
+After generating the skill, update project-root `./AGENTS.md`:
+- If `./AGENTS.md` does not exist, create it.
+- If the section header `## Topical Skills (Agent Instruction)` is missing, insert this exact block at the top of `./AGENTS.md`:
+  - If the file starts with `# AGENTS.md`, place the block immediately after that heading.
+  - Otherwise, place the block at the very beginning of the file.
+
+```markdown
+## Topical Skills (Agent Instruction)
+
+Skills with a `topical-` prefix are focused implementation guides for a specific topic. They capture common coding conventions, recurring patterns, and proven solutions for that domain.
+
+How to use them:
+- Use relevant `topical-*` skills early to understand likely best patterns for the task.
+- Treat them as a strong starting point and often the preferred approach, not a hard-only source.
+- Combine skill guidance with codebase research and engineering judgment.
+- Prefer existing project conventions when they conflict with a generic pattern.
+- Before finishing, confirm your solution is consistent with both the codebase and any applicable `topical-*` guidance.
+```
+
 ## Input
 
 - **Required:** Path to markdown reference file
@@ -75,6 +96,7 @@ If skill location is not provided, use the `AskUserQuestion` tool:
 6. Format each file with problem/solution structure
 7. Generate SKILL.md with section-level index linking to files in `references/`
 8. Ensure project-root `./CLAUDE.md` contains the mandatory "SKILL CHECK BEFORE ANY ACTION" section (add it if missing)
+9. Ensure project-root `./AGENTS.md` contains the mandatory "Topical Skills (Agent Instruction)" section (add it if missing)
 
 ## Source File Format
 
