@@ -10,9 +10,9 @@ Creates a Claude Code skill from a single markdown architecture document. Splits
 
 ## Project Root CLAUDE.md Update (MANDATORY)
 
-After generating the skill, update project-root `./CLAUDE.md`:
-- If `./CLAUDE.md` does not exist, create it.
-- If the section header `## MANDATORY - SKILL CHECK BEFORE ANY ACTION` is missing, insert this exact block at the top of `./CLAUDE.md`:
+After generating the skill, update `.claude/CLAUDE.md`:
+- If `.claude/CLAUDE.md` does not exist, create it.
+- If the section header `## MANDATORY - SKILL CHECK BEFORE ANY ACTION` is missing, insert this exact block at the top of `.claude/CLAUDE.md`:
   - If the file starts with `# CLAUDE.md`, place the block immediately after that heading.
   - Otherwise, place the block at the very beginning of the file.
 
@@ -95,7 +95,7 @@ If skill location is not provided, use the `AskUserQuestion` tool:
 5. Split content at `---` separators into logical files (max 8 files, each under 400 lines) inside `references/`
 6. Format each file with problem/solution structure
 7. Generate SKILL.md with section-level index linking to files in `references/`
-8. Ensure project-root `./CLAUDE.md` contains the mandatory "SKILL CHECK BEFORE ANY ACTION" section (add it if missing)
+8. Ensure `.claude/CLAUDE.md` contains the mandatory "SKILL CHECK BEFORE ANY ACTION" section (add it if missing)
 9. Ensure project-root `./AGENTS.md` contains the mandatory "Topical Skills (Agent Instruction)" section (add it if missing)
 
 ## Source File Format
