@@ -46,7 +46,7 @@
       "name": "creating-topical-skills",
       "source": "./creating-topical-skills",
       "strict": false,
-      "version": "1.5.2",
+      "version": "1.5.3",
       "description": "Comprehensive guide and tools for creating high-quality Agent Skills in Claude Code",
       "license": "MIT",
       "keywords": ["skills", "agent-skills", "tutorial", "documentation"]
