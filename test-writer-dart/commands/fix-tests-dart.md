@@ -203,6 +203,38 @@ Write the report file using the Write tool, then confirm to the user:
 - Report file location
 - Brief summary of results
 
+### Phase 7: Cleanup
+
+Remove the plan files to clean up temporary workflow state.
+
+**Plan files to remove**:
+- `test/plans/[filename]_plan.md`
+- `test/plans/[filename]_fix_plan.md` (if it exists)
+
+Use the Bash tool to delete the files:
+```
+rm test/plans/[filename]_plan.md
+rm test/plans/[filename]_fix_plan.md 2>/dev/null || true
+```
+
+**Note**: The report file is preserved as the permanent record. Only the temporary plan files are removed.
+
+## Rules
+
+Remove the plan files to clean up temporary workflow state.
+
+**Plan files to remove**:
+- `test/plans/[filename]_plan.md`
+- `test/plans/[filename]_fix_plan.md` (if it exists)
+
+Use the Bash tool to delete the files:
+```
+rm test/plans/[filename]_plan.md
+rm test/plans/[filename]_fix_plan.md 2>/dev/null || true
+```
+
+**Note**: The report file is preserved as the permanent record. Only the temporary plan files are removed.
+
 ## Rules
 
 1. **Sequential execution**: Complete each phase before starting the next. NEVER invoke multiple agents in parallel.

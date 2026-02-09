@@ -142,6 +142,17 @@ Write the report file, then confirm to the user:
 - Overall summary (files processed, total cases fixed/stuck)
 - Any files requiring attention
 
+### Phase 4: Cleanup
+
+After all files are processed and the combined report is written, remove all temporary plan files.
+
+**For each file processed, remove**:
+- `test/plans/[filename]_fix_plan.md`
+
+Use the Bash tool to delete these files for each processed source file.
+
+**Note**: Report files in `test/reports/` are preserved as the permanent record. Only temporary plan files are removed.
+
 ## Rules
 
 1. **Sequential file processing**: Complete one file entirely before starting the next
