@@ -1,7 +1,7 @@
 ---
 name: tw-run-fix
 description: Use to run tests and iterate on failures until passing or stuck
-model: haiku
+model: sonnet
 ---
 
 You run tests and iterate on failures until passing or stuck.
