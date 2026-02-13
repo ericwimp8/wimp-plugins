@@ -2,7 +2,7 @@
 
 A comprehensive Claude Code plugin for creating and managing high-quality Agent Skills. This plugin provides a complete toolset for transforming codebase analysis and documentation into reusable Claude Code skills.
 
-**Version:** 1.5.0
+**Version:** 1.5.1
 **Author:** Eric Wimp
 **License:** MIT
 
@@ -290,20 +290,23 @@ Skills provide specialized guidance and tooling. They can be invoked directly or
 Run the script from the skill directory (paths are relative to skill root):
 
 ```bash
-bash scripts/tree.sh /path/to/project
+bash scripts/tree.sh /path/to/project /path/to/output.txt
 ```
 
 **With Ignore Patterns:**
 
 ```bash
 # Flutter/Dart project
-bash scripts/tree.sh /project --ignore ".git,.dart_tool,build,.packages,Pods,.gradle"
+bash scripts/tree.sh /project /tmp/tree.txt --ignore ".git,.dart_tool,build,.packages,Pods,.gradle"
 
 # Node.js project
-bash scripts/tree.sh /project --ignore ".git,node_modules,dist,.cache,.next"
+bash scripts/tree.sh /project /tmp/tree.txt --ignore ".git,node_modules,dist,.cache,.next"
 
 # Python project
-bash scripts/tree.sh /project --ignore ".git,__pycache__,.venv,.pytest_cache,*.egg-info"
+bash scripts/tree.sh /project /tmp/tree.txt --ignore ".git,__pycache__,.venv,.pytest_cache,*.egg-info"
+
+# Path-specific ignore
+bash scripts/tree.sh /project /tmp/tree.txt --ignore ".git,ios/Pods,android/.gradle"
 ```
 
 **Output Format:**

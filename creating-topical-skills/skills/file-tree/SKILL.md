@@ -26,23 +26,22 @@ bash scripts/tree.sh <directory> <output-file> [--ignore "pattern1,pattern2"] [-
 
 ### Options
 
-- `--ignore "pattern1,pattern2"` - Exclude directories/files by **name** (see below)
+- `--ignore "pattern1,pattern2"` - Exclude directories/files by name or relative path (see below)
 - `--type "ext"` - Only include files with this extension (e.g., `ts`, `dart`, `.md`)
 
 ## How `--ignore` Works
 
-**IMPORTANT: Patterns match directory/file NAMES only, not paths.**
-
-The script uses `find -name "pattern"` which matches the basename (final component) of each path.
+Patterns support two forms:
+- **Name match** (basename): `node_modules`, `Pods`, `.gradle`
+- **Relative path match** (from `<directory>`): `ios/Pods`, `android/.gradle`
 
 | Pattern | Matches | Does NOT Match |
 |---------|---------|----------------|
 | `node_modules` | `project/node_modules`, `project/functions/node_modules`, `a/b/c/node_modules` | - |
 | `Pods` | `ios/Pods`, `any/path/Pods` | - |
 | `.gradle` | `android/.gradle`, `foo/.gradle` | - |
-| `ios/Pods` | **NOTHING** - there's no directory literally named "ios/Pods" | `ios/Pods` (this is `Pods` inside `ios/`) |
-
-**Common mistake:** Don't use paths like `ios/Pods` or `android/.gradle`. Use just the name: `Pods`, `.gradle`.
+| `ios/Pods` | `project/ios/Pods` | `project/app/ios/Pods` |
+| `android/.gradle` | `project/android/.gradle` | `project/.gradle` |
 
 ## Output
 

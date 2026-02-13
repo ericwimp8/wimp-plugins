@@ -52,22 +52,41 @@ fi
 FIND_ARGS=("$DIR")
 
 # Add prune expressions for ignore patterns
+# Supported ignore styles:
+# - Basename match: "node_modules" (matches any directory/file with that name)
+# - Relative path match: "ios/Pods" (matches only that path under DIR)
 if [[ -n "$IGNORE_PATTERNS" ]]; then
     IFS=',' read -ra PATTERNS <<< "$IGNORE_PATTERNS"
-    FIND_ARGS+=("(")
-    first=true
+    IGNORE_ARGS=()
+    ignore_count=0
     for pattern in "${PATTERNS[@]}"; do
         pattern=$(echo "$pattern" | xargs)  # trim whitespace
         if [[ -z "$pattern" ]]; then
             continue
         fi
-        if [[ "$first" != true ]]; then
-            FIND_ARGS+=("-o")
+
+        if [[ "$ignore_count" -gt 0 ]]; then
+            IGNORE_ARGS+=("-o")
         fi
-        FIND_ARGS+=("-name" "$pattern")
-        first=false
+
+        if [[ "$pattern" == */* ]]; then
+            if [[ "$pattern" == /* ]]; then
+                path_pattern="$pattern"
+            else
+                path_pattern="${pattern#./}"
+                path_pattern="${path_pattern#/}"
+                path_pattern="$DIR/$path_pattern"
+            fi
+            IGNORE_ARGS+=("(" "-path" "$path_pattern" "-o" "-path" "$path_pattern/*" ")")
+        else
+            IGNORE_ARGS+=("-name" "$pattern")
+        fi
+        ignore_count=$((ignore_count + 1))
     done
-    FIND_ARGS+=(")" "-prune" "-o")
+
+    if [[ "$ignore_count" -gt 0 ]]; then
+        FIND_ARGS+=("(" "${IGNORE_ARGS[@]}" ")" "-prune" "-o")
+    fi
 fi
 
 # Add type filter
