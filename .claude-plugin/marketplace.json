@@ -9,44 +9,10 @@
   },
   "plugins": [
     {
-      "name": "test-writer-dart",
-      "version": "1.3.0",
-      "source": "./",
-      "description": "Test generation for Dart and Flutter with mocktail and Riverpod patterns",
-      "commands": ["./test-writer-dart/commands", "./shared/commands"],
-      "agents": [
-        "./shared/agents/tw-plan-cases.md",
-        "./shared/agents/tw-write-test.md",
-        "./shared/agents/tw-check-redundancy.md",
-        "./shared/agents/tw-run-fix.md",
-        "./shared/agents/tw-check-testability.md",
-        "./shared/agents/tw-discover-failing-tests.md",
-        "./shared/agents/tw-audit.md"
-      ],
-      "skills": ["./test-writer-dart/skills"]
-    },
-    {
-      "name": "test-writer-typescript",
-      "version": "1.2.0",
-      "source": "./",
-      "description": "Test generation for TypeScript with Jest and Firebase Functions patterns",
-      "commands": ["./test-writer-typescript/commands", "./shared/commands"],
-      "agents": [
-        "./shared/agents/tw-plan-cases.md",
-        "./shared/agents/tw-write-test.md",
-        "./shared/agents/tw-check-redundancy.md",
-        "./shared/agents/tw-run-fix.md",
-        "./shared/agents/tw-check-testability.md",
-        "./shared/agents/tw-discover-failing-tests.md",
-        "./shared/agents/tw-audit.md"
-      ],
-      "skills": ["./test-writer-typescript/skills"]
-    },
-    {
       "name": "creating-topical-skills",
       "source": "./creating-topical-skills",
       "strict": false,
-      "version": "1.5.5",
+      "version": "1.5.7",
       "description": "Comprehensive guide and tools for creating high-quality Agent Skills in Claude Code",
       "license": "MIT",
       "keywords": ["skills", "agent-skills", "tutorial", "documentation"]
