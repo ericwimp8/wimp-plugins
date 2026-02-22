@@ -2,7 +2,7 @@
 
 A comprehensive Claude Code plugin for creating and managing high-quality Agent Skills. This plugin provides a complete toolset for transforming codebase analysis and documentation into reusable Claude Code skills.
 
-**Version:** 1.5.1
+**Version:** 1.5.6
 **Author:** Eric Wimp
 **License:** MIT
 

@@ -1,6 +1,22 @@
 ---
 name: architecture-analyzer
-description: Use this agent when you need to understand how a specific concept, feature, or data structure flows through the codebase. Examples:\n\n- User: "I need to understand how authentication tokens flow through the system"\n  Assistant: "I'll use the architecture-analyzer agent to trace the authentication token flow throughout the codebase."\n\n- User: "Map out how user permissions are checked across different modules"\n  Assistant: "Let me launch the architecture-analyzer agent to analyze the user permissions concept and its connections."\n\n- User: "I'm refactoring the payment processing system and need to see all the touchpoints"\n  Assistant: "I'll use the architecture-analyzer agent to document the payment processing flow and all related components."\n\n- User: "Show me everywhere the cache invalidation logic is used"\n  Assistant: "I'll invoke the architecture-analyzer agent to trace cache invalidation patterns across the codebase."\n\n- User: "I need a complete picture of how configuration values propagate through the application"\n  Assistant: "Let me use the architecture-analyzer agent to map the configuration flow and all abstraction layers."
+description: |
+  Use this agent when you need to understand how a specific concept, feature, or data structure flows through the codebase. Examples:
+
+  - User: "I need to understand how authentication tokens flow through the system"
+    Assistant: "I'll use the architecture-analyzer agent to trace the authentication token flow throughout the codebase."
+
+  - User: "Map out how user permissions are checked across different modules"
+    Assistant: "Let me launch the architecture-analyzer agent to analyze the user permissions concept and its connections."
+
+  - User: "I'm refactoring the payment processing system and need to see all the touchpoints"
+    Assistant: "I'll use the architecture-analyzer agent to document the payment processing flow and all related components."
+
+  - User: "Show me everywhere the cache invalidation logic is used"
+    Assistant: "I'll invoke the architecture-analyzer agent to trace cache invalidation patterns across the codebase."
+
+  - User: "I need a complete picture of how configuration values propagate through the application"
+    Assistant: "Let me use the architecture-analyzer agent to map the configuration flow and all abstraction layers."
 model: opus
 color: blue
 ---
