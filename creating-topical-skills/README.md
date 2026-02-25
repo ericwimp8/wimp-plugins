@@ -2,7 +2,7 @@
 
 A comprehensive Claude Code plugin for creating and managing high-quality Agent Skills. This plugin provides a complete toolset for transforming codebase analysis and documentation into reusable Claude Code skills.
 
-**Version:** 1.5.6
+**Version:** 1.5.8
 **Author:** Eric Wimp
 **License:** MIT
 
@@ -191,7 +191,7 @@ Agents are specialized Claude Code agents that execute specific tasks. They are 
 
 **Responsibilities:**
 - Detects project type (Flutter, React, Python, Node.js, etc.)
-- Uses the `file-tree` skill to analyze directory structure
+- Performs a structure survey to analyze directory layout and module boundaries
 - Samples key files to identify architectural patterns
 - Outputs a prioritized list of architectural concepts
 
@@ -272,52 +272,6 @@ Agents are specialized Claude Code agents that execute specific tasks. They are 
 ## Available Skills
 
 Skills provide specialized guidance and tooling. They can be invoked directly or used by agents.
-
-### `file-tree`
-
-**Purpose:** Generate and analyze project directory structures
-**When to Use:** When you need to visualize codebase layout, understand folder organization, or explore project structure
-
-**Provides:**
-- Shell script for generating directory trees
-- Ignore pattern support for build artifacts and dependencies
-- Framework-aware pattern suggestions (Flutter, Node.js, Python)
-
-**Script Location:** [tree.sh](scripts/tree.sh)
-
-**Usage:**
-
-Run the script from the skill directory (paths are relative to skill root):
-
-```bash
-bash scripts/tree.sh /path/to/project /path/to/output.txt
-```
-
-**With Ignore Patterns:**
-
-```bash
-# Flutter/Dart project
-bash scripts/tree.sh /project /tmp/tree.txt --ignore ".git,.dart_tool,build,.packages,Pods,.gradle"
-
-# Node.js project
-bash scripts/tree.sh /project /tmp/tree.txt --ignore ".git,node_modules,dist,.cache,.next"
-
-# Python project
-bash scripts/tree.sh /project /tmp/tree.txt --ignore ".git,__pycache__,.venv,.pytest_cache,*.egg-info"
-
-# Path-specific ignore
-bash scripts/tree.sh /project /tmp/tree.txt --ignore ".git,ios/Pods,android/.gradle"
-```
-
-**Output Format:**
-```
-project/src/main.ts
-project/src/utils/helper.ts
-project/package.json
-...
-```
-
----
 
 ### `skill-format-guide`
 
@@ -423,7 +377,6 @@ Each agent runs as a separate Claude instance with specialized instructions:
 
 Skills provide reusable guidance and utilities:
 
-- **`file-tree`**: Directory structure visualization
 - **`skill-format-guide`**: Multi-file skill creation guidance
 - **`skill-format-guide-toc`**: Single-file skill creation guidance
 
@@ -446,7 +399,7 @@ Skills provide reusable guidance and utilities:
           │ architecture-scanner   │
           │ (Sonnet, Green)        │
           │                        │
-          │ Uses: file-tree skill  │
+          │ Runs: structure survey │
           │ Output: _concepts.md   │
           └────────────┬───────────┘
                        │
@@ -495,14 +448,13 @@ Skills provide reusable guidance and utilities:
 1. **Separation of Concerns**: Commands orchestrate, agents execute specialized tasks, skills provide guidance
 2. **Progressive Disclosure**: Skills and documents enable LLM reading by section, not requiring full file loads
 3. **Parallel Execution**: Multiple architecture analyzers and skill generators run concurrently (max 3 each)
-4. **Framework Agnostic**: File-tree patterns adapt to project type; agents work across any codebase
+4. **Framework Agnostic**: Discovery patterns adapt to project type; agents work across any codebase
 5. **LLM Optimization**: All output is formatted for LLM consumption without human interpretation
 
 ## Requirements & Dependencies
 
 ### System Requirements
 - Claude Code installed and configured
-- Bash shell (for `file-tree` script)
 - Read access to the target codebase
 
 ### Model Requirements
@@ -511,7 +463,6 @@ Skills provide reusable guidance and utilities:
 - **skill-builder-agent**: Claude Sonnet 3.5 (default)
 
 ### Skill Dependencies
-- `file-tree`: Used by `architecture-scanner` agent
 - `skill-format-guide-toc`: Used in skill generation pipeline
 - `skill-format-guide`: Used in skill generation pipeline
 

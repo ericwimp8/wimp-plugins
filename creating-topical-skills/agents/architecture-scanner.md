@@ -28,15 +28,15 @@ Examine root directory:
 - Key dependencies from manifest files
 
 ### 2. Structure Survey
-Produce a high-signal structure survey of the target directory using your available file-discovery tools.
+Survey the repository structure using your available file-discovery tools.
 
-Requirements for this survey:
-- Cover the full codebase layout (not just a sampled subtree)
-- Exclude generated, dependency, and build artifact directories that obscure architecture
-- Capture enough path-level evidence to identify module boundaries, layering, and conventions
+Survey requirements:
+- Cover the full target codebase, not just a sampled subtree
+- Exclude generated outputs and dependency directories that obscure architecture
+- Gather enough path-level evidence to infer module boundaries, layering, and conventions
 - Keep the survey reproducible and efficient for large repositories
 
-Analyze the tree output for:
+Analyze the survey results for:
 - Top-level folder organization and module boundaries
 - Naming conventions (features/, core/, shared/, components/)
 - Entry points and configuration files
